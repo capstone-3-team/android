@@ -50,9 +50,9 @@ object Dependencies {
     const val COROUTINE_PLAY_SERVICES =
         "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:${Versions.COROUTINE}"
 
-//    const val COIL = "io.coil-kt:coil:${Versions.COIL}"
-//    const val COIL_GIF = "io.coil-kt:coil-gif:${Versions.COIL}"
-//    const val COIL_COMPOSE = "io.coil-kt:coil-compose:${Versions.COIL}"
+    const val COIL = "io.coil-kt:coil:${Versions.COIL}"
+    const val COIL_GIF = "io.coil-kt:coil-gif:${Versions.COIL}"
+    const val COIL_COMPOSE = "io.coil-kt:coil-compose:${Versions.COIL}"
 
     const val ROOM_RUNTIME = "androidx.room:room-runtime:${Versions.ROOM}"
     const val ROOM_KTX = "androidx.room:room-ktx:${Versions.ROOM}"

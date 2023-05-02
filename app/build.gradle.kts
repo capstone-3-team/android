@@ -78,9 +78,9 @@ dependencies {
     implementation (Dependencies.TIMBER)
 
 //    // coil
-//    implementation (Dependencies.COIL)
-//    implementation (Dependencies.COIL_GIF)
-//    implementation (Dependencies.COIL_COMPOSE)
+    implementation (Dependencies.COIL)
+    implementation (Dependencies.COIL_GIF)
+    implementation (Dependencies.COIL_COMPOSE)
 
     // navigation
     implementation (Dependencies.COMPOSE_NAVIGATION)
