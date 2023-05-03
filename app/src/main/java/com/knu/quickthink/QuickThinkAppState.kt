@@ -27,6 +27,8 @@ class QuickThinkAppState(
             if(!isMainRoute.value && destination.route!!.contains("main")) {
                 isMainRoute.value = true
                 Timber.tag("navigation").d("isMainRoute = true")
+            }else if(isMainRoute.value && !destination.route!!.contains("main")){
+                isMainRoute.value = false
             }
         }
         navController.addOnDestinationChangedListener(callback)
