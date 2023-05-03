@@ -1,24 +1,35 @@
 package com.knu.quickthink
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.runtime.*
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun rememberQuickThinkAppState(
     navController: NavHostController = rememberNavController(),
-) = remember(navController){
-    QuickThinkAppState(navController)
+    coroutineScope :CoroutineScope = rememberCoroutineScope(),
+    sheetState : ModalBottomSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+//        confirmStateChange = { it != ModalBottomSheetValue.Hidden }
+    )
+) = remember(navController,coroutineScope,sheetState){
+    QuickThinkAppState(navController,coroutineScope,sheetState)
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 class QuickThinkAppState(
     val navController: NavHostController,
+    val coroutineScope :CoroutineScope,
+    val sheetState : ModalBottomSheetState,
     val isMainRoute : MutableState<Boolean> = mutableStateOf(false)
 ) {
     fun addDestinationChangedListener(
