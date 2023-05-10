@@ -81,4 +81,8 @@ object Dependencies {
     const val COMPOSE_UI_PREVIEW =
         "androidx.compose.ui:ui-tooling-preview:${Versions.COMPOSE_UI}"
 
+    // BottomSheet Navigation을 위함
+    const val NAVIGATION_MATERIAL =
+        "com.google.accompanist:accompanist-navigation-material:${Versions.ACCOMPANIST_NAVIGATION_MATERIAL}"
+
 }

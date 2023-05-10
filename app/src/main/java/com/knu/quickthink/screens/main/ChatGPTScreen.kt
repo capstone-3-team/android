@@ -1,4 +1,4 @@
-package com.knu.quickthink.screens
+package com.knu.quickthink.screens.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -11,13 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 @Composable
-fun FeedScreen() {
+fun ChatGPTScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
             .wrapContentSize(Alignment.Center)
     ) {
-        Text(text = "FeedScreen")
+        Text(text = "ChatGPTScreen")
     }
 }
