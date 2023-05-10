@@ -83,6 +83,8 @@ object Dependencies {
 
     // BottomSheet Navigation을 위함
     const val NAVIGATION_MATERIAL =
-        "com.google.accompanist:accompanist-navigation-material:${Versions.ACCOMPANIST_NAVIGATION_MATERIAL}"
+        "com.google.accompanist:accompanist-navigation-material:${Versions.ACCOMPANIST}"
 
+    const val FLOWLAYOUT =
+        "com.google.accompanist:accompanist-flowlayout:${Versions.ACCOMPANIST}"
 }
