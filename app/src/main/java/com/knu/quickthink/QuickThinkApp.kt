@@ -58,6 +58,9 @@ fun QuickThinkApp(appState: QuickThinkAppState = rememberQuickThinkAppState()) {
                 topBar = {
                     if (appState.isMainRoute.value) {
                         QuickThinkTopAppBar(
+                            onLogoClicked = {
+                                appState.navController.navigate(MainDestination.MAIN_ROUTE)
+                            },
                             onSearchClicked = {
                                 appState.navController.navigate(MainDestination.SERACH_ROUTE)
                                 appState.coroutineScope.launch {
