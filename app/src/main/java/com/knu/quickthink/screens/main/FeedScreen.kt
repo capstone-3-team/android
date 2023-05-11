@@ -14,11 +14,13 @@ import com.knu.quickthink.components.CardContent
 import com.knu.quickthink.data.Card
 
 @Composable
-fun FeedScreen() {
+fun FeedScreen(
+    onCardClick : (Card) -> Unit
+) {
     CardContent(
         cards = testCards,
         currentFilteringLabel = R.string.app_name,
-        onCardClick = {},
+        onCardClick = onCardClick,
         onTaskCheckedChange = {_,_ -> }
     )
 }
