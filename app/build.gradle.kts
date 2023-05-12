@@ -65,6 +65,7 @@ dependencies {
     implementation (Dependencies.COMPOSE_UI_PREVIEW)
     implementation (Dependencies.COMPOSE_MATERIAL)
     implementation(Dependencies.FLOWLAYOUT)
+    implementation(Dependencies.LIFECYCLE_RUNTIME_COMPOSE)
 
     // Test
     testImplementation (Testing.JUNIT4)

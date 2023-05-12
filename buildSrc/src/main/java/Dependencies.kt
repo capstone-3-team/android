@@ -9,6 +9,8 @@ object Dependencies {
     LifeCycle viewModel
     Coroutine LifeCycle Scopes
     */
+    const val LIFECYCLE_RUNTIME_COMPOSE =
+        "androidx.lifecycle:lifecycle-runtime-compose:2.6.0-alpha03"
     const val LIFECYCLE_VIEWMODEL_COMPOSE =
         "androidx.lifecycle:lifecycle-viewmodel-compose:${Versions.LIFECYCLE}"
     const val LIFECYCLE_SAVEDSTATE =
