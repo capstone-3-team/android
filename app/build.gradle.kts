@@ -149,6 +149,9 @@ dependencies {
     // Hilt navigation
     implementation (Dependencies.HILT_COMPOSE_NAVIGATION)
 
+    // WebView
+    implementation(Dependencies.WEBVIEW)
+
 }
 
 tasks.register("prepareKotlinBuildScriptModel"){}

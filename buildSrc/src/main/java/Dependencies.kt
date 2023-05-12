@@ -87,4 +87,7 @@ object Dependencies {
 
     const val FLOWLAYOUT =
         "com.google.accompanist:accompanist-flowlayout:${Versions.ACCOMPANIST}"
+
+    const val WEBVIEW =
+        "com.google.accompanist:accompanist-webview:${Versions.ACCOMPANIST}"
 }
