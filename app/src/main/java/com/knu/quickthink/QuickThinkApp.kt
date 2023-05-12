@@ -91,8 +91,14 @@ fun QuickThinkApp(appState: QuickThinkAppState = rememberQuickThinkAppState()) {
                     }
                     composable(route = MainDestination.LOGIN_ROUTE) {
                         LoginScreen(
-                            onLoginClicked = { appState.navController.navigate(MainDestination.MAIN_ROUTE) },
+                            onLoginClicked = { appState.navController.navigate(MainDestination.LOGIN_WEBVIEW_ROUTE) },
                             onSignUpClicked = { appState.navController.navigate(MainDestination.MAIN_ROUTE) }
+                        )
+                    }
+                    composable(route = MainDestination.LOGIN_WEBVIEW_ROUTE){
+                        LoginWebViewScreen(
+                            onBackPressed = {appState.navController.popBackStack()},
+                            onLoginSuccess = { appState.navController.navigate(MainDestination.MAIN_ROUTE)}
                         )
                     }
                     navigation(

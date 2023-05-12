@@ -3,6 +3,7 @@ package com.knu.quickthink.navigation
 object MainDestination{
     const val SPlASH_ROUTE = "splash"
     const val LOGIN_ROUTE = "login"
+    const val LOGIN_WEBVIEW_ROUTE = "login/webview"
     const val SIGNUP_ROUTE = "signup"
     const val MAIN_ROUTE = "main"
     const val FEED_ROUTE = "main/feed"
