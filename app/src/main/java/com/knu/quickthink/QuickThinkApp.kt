@@ -12,7 +12,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -23,8 +25,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.navigation
 import androidx.navigation.plusAssign
 import coil.compose.AsyncImagePainter
@@ -44,7 +48,7 @@ import timber.log.Timber
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.bottomSheet
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialNavigationApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialNavigationApi::class,ExperimentalComposeUiApi::class)
 @Composable
 fun QuickThinkApp(appState: QuickThinkAppState = rememberQuickThinkAppState()) {
     QuickThinkTheme {
@@ -58,6 +62,9 @@ fun QuickThinkApp(appState: QuickThinkAppState = rememberQuickThinkAppState()) {
                 topBar = {
                     if (appState.isMainRoute.value) {
                         QuickThinkTopAppBar(
+                            onLogoClicked = {
+                                appState.navController.navigate(MainDestination.MAIN_ROUTE)
+                            },
                             onSearchClicked = {
                                 appState.navController.navigate(MainDestination.SERACH_ROUTE)
                                 appState.coroutineScope.launch {
@@ -93,7 +100,11 @@ fun QuickThinkApp(appState: QuickThinkAppState = rememberQuickThinkAppState()) {
                         startDestination = MainDestination.FEED_ROUTE
                     ) {
                         composable(route = MainDestination.FEED_ROUTE) {
-                            FeedScreen()
+                            FeedScreen(
+                                onCardClick = {
+                                    appState.navController.navigate(MainDestination.CARD_VIEW_ROUTE)
+                                }
+                            )
                         }
                         composable(route = MainDestination.ACCOUNT_ROUTE) {
                             AccountScreen()
@@ -108,6 +119,21 @@ fun QuickThinkApp(appState: QuickThinkAppState = rememberQuickThinkAppState()) {
                                     SearchScreen()
                                 }
                             }
+                        }
+                        dialog(
+                            route = MainDestination.CARD_VIEW_ROUTE,
+                            dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
+                        ){
+                            Surface(
+                            modifier = Modifier
+                                .width(400.dp)
+                                .height(600.dp)
+                                .padding(10.dp)
+                                .clip(RoundedCornerShape(20.dp))
+                        ) {
+                            CardViewScreen()
+                        }
+
                         }
                     }
                 }

@@ -2,6 +2,7 @@ package com.knu.quickthink.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -83,6 +84,7 @@ fun GoogleLoginButton(
 
 @Composable
 fun QuickThinkTopAppBar(
+    onLogoClicked : () -> Unit,
     onSearchClicked : () -> Unit,
     onChatGPTClicked : () -> Unit,
     onAccountClicked : () -> Unit,
@@ -105,6 +107,9 @@ fun QuickThinkTopAppBar(
                 Image(
                     painter = painter,
                     contentDescription = "logo Img",
+                    modifier = Modifier.clickable {
+                        onLogoClicked()
+                    }
 //                    modifier = Modifier.size(30.dp)
                 )
                 if (painter.state is AsyncImagePainter.State.Loading ||

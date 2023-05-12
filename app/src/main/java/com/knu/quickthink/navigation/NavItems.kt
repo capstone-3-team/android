@@ -9,4 +9,5 @@ object MainDestination{
     const val CHATGPT_ROUTE = "main/chatgpt"
     const val SERACH_ROUTE = "main/search"
     const val ACCOUNT_ROUTE = "main/account"
+    const val CARD_VIEW_ROUTE = "main/cardview"
 }
