@@ -1,4 +1,4 @@
-package com.knu.quickthink.data
+package com.knu.quickthink.model
 
 data class Card(
     val id: String="",

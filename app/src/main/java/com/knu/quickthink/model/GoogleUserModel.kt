@@ -1,4 +1,4 @@
-package com.knu.quickthink.data
+package com.knu.quickthink.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
