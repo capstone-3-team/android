@@ -41,8 +41,8 @@ fun LoginScreen(
                             googleName = gsa.displayName!!,
                             googleId = gsa.id!!,
                             profilePicture = gsa.photoUrl.toString()
-                            )
-
+                        )
+                        viewModel.login()
                     }
                 }else{
                     isError.value = true
@@ -51,12 +51,13 @@ fun LoginScreen(
                 Timber.tag("googleLogin").e("Error in LoginScreen ApiException : $e")
             }
         }
-
-    if(isLogInSuccess.value){
-        Timber.tag("googleLogin").d("loginSuccess")
-        viewModel.hideLoading()
-        onLoginSuccess()
-        viewModel.loginFinished()
+    LaunchedEffect(isLogInSuccess){
+        if(isLogInSuccess.value){
+            Timber.tag("googleLogin").d("loginSuccess")
+            viewModel.hideLoading()
+            onLoginSuccess()
+            viewModel.loginFinished()
+        }
     }
         // 이걸 안해주면 recomposition이 무제한으로 일어남  왜이런거지? MutableStateFlow때문인가?
 //        viewModel.loginFinish()

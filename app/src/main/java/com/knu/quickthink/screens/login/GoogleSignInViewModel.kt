@@ -3,16 +3,23 @@ package com.knu.quickthink.screens.login
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.knu.quickthink.data.GoogleUserModel
+import com.knu.quickthink.model.GoogleUserModel
+import com.knu.quickthink.model.onError
+import com.knu.quickthink.model.onException
+import com.knu.quickthink.model.onSuccess
+import com.knu.quickthink.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class GoogleSignInViewModel @Inject constructor(application: Application): ViewModel(){
+class GoogleSignInViewModel @Inject constructor(
+    private val authRepository: AuthRepository
+): ViewModel(){
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -35,8 +42,22 @@ class GoogleSignInViewModel @Inject constructor(application: Application): ViewM
             )
             Timber.tag("googleLogin").d("GoogleUserModel : ${_userState.value}")
         }
+    }
+
+    fun login(){
         if(_userState.value != null){
-            _isLogInSuccess.value = true
+            viewModelScope.launch {
+                authRepository.login(_userState.value!!)
+                    .onSuccess {
+                        Timber.tag("googleLogin").d("onSuccess message : $it")
+                        _isLogInSuccess.update{true}
+                    }
+                    .onError { code, message ->
+                        Timber.tag("googleLogin").d("onError code : $code, message : $message")
+                    }.onException { e ->
+                        Timber.tag("googleLogin").d("onException message : ${e.message}")
+                    }
+            }
         }
         _isLoading.value = false
     }
