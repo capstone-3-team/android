@@ -149,6 +149,10 @@ dependencies {
     // Hilt navigation
     implementation (Dependencies.HILT_COMPOSE_NAVIGATION)
 
+    //Auth
+    implementation(Dependencies.GOOGLE_AUTH)
+
+    implementation(Dependencies.LOTTIE)
 }
 
 tasks.register("prepareKotlinBuildScriptModel"){}

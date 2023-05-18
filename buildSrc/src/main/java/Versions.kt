@@ -34,4 +34,6 @@ object Versions {
     const val HILT_EXTENSION = "1.0.0" // Hilt Extension (workmanager에 의존성을 주입하기 위함)
     const val ACTIVITY_KTX = "1.6.1" // by viewModel
     const val ACCOMPANIST = "0.28.0"
+    const val GOOGLE_AUTH = "20.1.0"
+    const val LOTTIE = "6.0.0"
 }

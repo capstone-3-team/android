@@ -1,58 +1,54 @@
 package com.knu.quickthink
 
-import android.graphics.drawable.shapes.Shape
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.Animatable
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import android.app.Activity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navigation
 import androidx.navigation.plusAssign
-import coil.compose.AsyncImagePainter
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.knu.quickthink.components.QuickThinkTopAppBar
 import com.knu.quickthink.navigation.MainDestination
-import com.knu.quickthink.screens.LoginScreen
 import com.knu.quickthink.screens.SplashScreen
 import com.knu.quickthink.screens.main.*
 import com.knu.quickthink.ui.theme.QuickThinkTheme
-import com.knu.quickthink.ui.theme.Shapes
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.bottomSheet
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.knu.quickthink.screens.login.GoogleSignInViewModel
+import com.knu.quickthink.screens.login.LoginScreen
+import javax.inject.Inject
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialNavigationApi::class,ExperimentalComposeUiApi::class)
 @Composable
-fun QuickThinkApp(appState: QuickThinkAppState = rememberQuickThinkAppState()) {
+fun QuickThinkApp(
+    appState: QuickThinkAppState = rememberQuickThinkAppState(),
+    viewModel : GoogleSignInViewModel = hiltViewModel(),
+) {
     QuickThinkTheme {
+        val context = LocalContext.current as Activity
         appState.navController.navigatorProvider += appState.bottomSheetNavigator
+
+//        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)               // gso for logout
+//            .requestIdToken(context.getString(R.string.gcp_web_client_id))
+//            .requestEmail()
+//            .build()
+//        val googleSignInClient = context.let { GoogleSignIn.getClient(it, gso) }
 
         ModalBottomSheetLayout(
             bottomSheetNavigator = appState.bottomSheetNavigator,
@@ -71,8 +67,13 @@ fun QuickThinkApp(appState: QuickThinkAppState = rememberQuickThinkAppState()) {
                                 }
                             },
                             onChatGPTClicked = { appState.navController.navigate(MainDestination.CHATGPT_ROUTE) },
-                            onSignOutClicked = { appState.navController.navigate(MainDestination.LOGIN_ROUTE) },
-                            onAccountClicked = { appState.navController.navigate(MainDestination.ACCOUNT_ROUTE) }
+                            onSignOutClicked = {
+                                viewModel.googleSignInClient.signOut().addOnCompleteListener(context){
+                                    appState.navController.navigate(MainDestination.LOGIN_ROUTE)
+                                    viewModel.logOut()
+                                }
+                            },
+                            onAccountClicked = { appState.navController.navigate(MainDestination.ACCOUNT_ROUTE) },
                         )
                     }
                 }
@@ -91,7 +92,7 @@ fun QuickThinkApp(appState: QuickThinkAppState = rememberQuickThinkAppState()) {
                     }
                     composable(route = MainDestination.LOGIN_ROUTE) {
                         LoginScreen(
-                            onLoginClicked = { appState.navController.navigate(MainDestination.MAIN_ROUTE) },
+                            onLoginSuccess = { appState.navController.navigate(MainDestination.MAIN_ROUTE) },
                             onSignUpClicked = { appState.navController.navigate(MainDestination.MAIN_ROUTE) }
                         )
                     }
@@ -130,10 +131,9 @@ fun QuickThinkApp(appState: QuickThinkAppState = rememberQuickThinkAppState()) {
                                 .height(600.dp)
                                 .padding(10.dp)
                                 .clip(RoundedCornerShape(20.dp))
-                        ) {
-                            CardViewScreen()
-                        }
-
+                            ) {
+                                CardViewScreen()
+                            }
                         }
                     }
                 }

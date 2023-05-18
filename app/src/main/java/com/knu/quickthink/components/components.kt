@@ -27,6 +27,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.knu.quickthink.R
 import androidx.compose.ui.res.vectorResource
+import com.airbnb.lottie.compose.*
 
 
 @Composable
@@ -193,6 +194,17 @@ fun QuickThinkTopAppBar(
         },
         backgroundColor = colorResource(id = R.color.white),
         elevation = 0.dp,
+    )
+}
+
+@Composable
+fun LottieImage(rawRes : Int, modifier: Modifier) {
+    val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(rawRes))
+    val progress by animateLottieCompositionAsState(composition, iterations = LottieConstants.IterateForever)
+    LottieAnimation(
+        composition = composition,
+        progress = { progress },
+        modifier = modifier,
     )
 }
 

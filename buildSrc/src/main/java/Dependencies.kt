@@ -59,32 +59,29 @@ object Dependencies {
     const val ROOM_KAPT = "androidx.room:room-compiler:${Versions.ROOM}"
     const val ROOM_PAGING = "androidx.room:room-paging:${Versions.ROOM}"
 
-    const val KOTLIN_SERIALIZATION =
-        "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.KOTLIN_SERIALIZATION}"
+    const val KOTLIN_SERIALIZATION = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.KOTLIN_SERIALIZATION}"
 
-    const val PREFERENCES_DATASTORE =
-        "androidx.datastore:datastore-preferences:${Versions.DATASTORE}"
+    const val PREFERENCES_DATASTORE = "androidx.datastore:datastore-preferences:${Versions.DATASTORE}"
 
 //    const val PAGING = "androidx.paging:paging-runtime-ktx:${Versions.PAGING}"
 
     const val WORKMANAGER = "androidx.work:work-runtime-ktx:${Versions.WORKMANAGER}"
 
-    const val ACTIVITY_KTX =
-        "androidx.activity:activity-ktx:${Versions.ACTIVITY_KTX}"
+    const val ACTIVITY_KTX = "androidx.activity:activity-ktx:${Versions.ACTIVITY_KTX}"
+    const val ACTIVITY_COMPOSE ="androidx.activity:activity-compose:${Versions.ACTIVITY_KTX}"
 
-    const val ACTIVITY_COMPOSE =
-        "androidx.activity:activity-compose:${Versions.ACTIVITY_KTX}"
+    const val COMPOSE_UI = "androidx.compose.ui:ui:${Versions.COMPOSE_UI}"
 
-    const val COMPOSE_UI =
-        "androidx.compose.ui:ui:${Versions.COMPOSE_UI}"
-
-    const val COMPOSE_UI_PREVIEW =
-        "androidx.compose.ui:ui-tooling-preview:${Versions.COMPOSE_UI}"
+    const val COMPOSE_UI_PREVIEW = "androidx.compose.ui:ui-tooling-preview:${Versions.COMPOSE_UI}"
 
     // BottomSheet Navigation을 위함
-    const val NAVIGATION_MATERIAL =
-        "com.google.accompanist:accompanist-navigation-material:${Versions.ACCOMPANIST}"
+    const val NAVIGATION_MATERIAL = "com.google.accompanist:accompanist-navigation-material:${Versions.ACCOMPANIST}"
 
-    const val FLOWLAYOUT =
-        "com.google.accompanist:accompanist-flowlayout:${Versions.ACCOMPANIST}"
+    const val FLOWLAYOUT = "com.google.accompanist:accompanist-flowlayout:${Versions.ACCOMPANIST}"
+
+    const val GOOGLE_AUTH = "com.google.android.gms:play-services-auth:${Versions.GOOGLE_AUTH}"
+
+    const val LIVEDATA = "androidx.compose.runtime:runtime-livedata:${Versions.COMPOSE_UI}"
+
+    const val LOTTIE = "com.airbnb.android:lottie-compose:${Versions.LOTTIE}"
 }
