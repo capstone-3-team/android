@@ -28,9 +28,11 @@ import kotlinx.coroutines.launch
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.bottomSheet
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.knu.quickthink.screens.login.GoogleSignInViewModel
 import com.knu.quickthink.screens.login.LoginScreen
+import javax.inject.Inject
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialNavigationApi::class,ExperimentalComposeUiApi::class)
 @Composable
@@ -42,11 +44,11 @@ fun QuickThinkApp(
         val context = LocalContext.current as Activity
         appState.navController.navigatorProvider += appState.bottomSheetNavigator
 
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)               // gso for logout
-            .requestIdToken(context.getString(R.string.gcp_web_client_id))
-            .requestEmail()
-            .build()
-        val googleSignInClient = context.let { GoogleSignIn.getClient(it, gso) }
+//        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)               // gso for logout
+//            .requestIdToken(context.getString(R.string.gcp_web_client_id))
+//            .requestEmail()
+//            .build()
+//        val googleSignInClient = context.let { GoogleSignIn.getClient(it, gso) }
 
         ModalBottomSheetLayout(
             bottomSheetNavigator = appState.bottomSheetNavigator,
@@ -66,7 +68,7 @@ fun QuickThinkApp(
                             },
                             onChatGPTClicked = { appState.navController.navigate(MainDestination.CHATGPT_ROUTE) },
                             onSignOutClicked = {
-                                googleSignInClient.signOut().addOnCompleteListener(context){
+                                viewModel.googleSignInClient.signOut().addOnCompleteListener(context){
                                     appState.navController.navigate(MainDestination.LOGIN_ROUTE)
                                     viewModel.logOut()
                                 }
