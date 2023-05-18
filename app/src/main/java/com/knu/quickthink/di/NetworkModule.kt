@@ -1,8 +1,8 @@
 package com.knu.quickthink.di
 
-import com.knu.quickthink.network.AuthApiService
-import com.knu.quickthink.repository.AuthRepository
-import com.knu.quickthink.repository.AuthRepositoryImpl
+import com.knu.quickthink.network.UserApiService
+import com.knu.quickthink.repository.UserRepository
+import com.knu.quickthink.repository.UserRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -16,8 +16,8 @@ import javax.inject.Singleton
 object NetworkModule {
     @Provides
     @Singleton
-    fun provideAuthApiService(retrofit: Retrofit): AuthApiService {
-        return retrofit.create(AuthApiService::class.java)
+    fun provideUserApiService(retrofit: Retrofit): UserApiService {
+        return retrofit.create(UserApiService::class.java)
     }
 }
 
@@ -28,6 +28,6 @@ abstract class RepositoryModule {
     @Singleton
     @Binds
     abstract fun bindAuthRepository(
-        AuthRepositoryImpl: AuthRepositoryImpl
-    ): AuthRepository
+        UserRepositoryImpl: UserRepositoryImpl
+    ): UserRepository
 }
