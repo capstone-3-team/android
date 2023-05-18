@@ -35,4 +35,5 @@ object Versions {
     const val ACTIVITY_KTX = "1.6.1" // by viewModel
     const val ACCOMPANIST = "0.28.0"
     const val GOOGLE_AUTH = "20.1.0"
+    const val LOTTIE = "6.0.0"
 }

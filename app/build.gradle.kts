@@ -151,6 +151,8 @@ dependencies {
 
     //Auth
     implementation(Dependencies.GOOGLE_AUTH)
+
+    implementation(Dependencies.LOTTIE)
 }
 
 tasks.register("prepareKotlinBuildScriptModel"){}

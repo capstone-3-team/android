@@ -82,4 +82,6 @@ object Dependencies {
     const val GOOGLE_AUTH = "com.google.android.gms:play-services-auth:${Versions.GOOGLE_AUTH}"
 
     const val LIVEDATA = "androidx.compose.runtime:runtime-livedata:${Versions.COMPOSE_UI}"
+
+    const val LOTTIE = "com.airbnb.android:lottie-compose:${Versions.LOTTIE}"
 }
