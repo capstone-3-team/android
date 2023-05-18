@@ -79,13 +79,14 @@ class AuthInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val newRequest = chain.request().newBuilder()
 //            .addHeader("Authorization", "Bearer $sessionId")
+            .addHeader("Content-Type","application/json")
             .build()
 
         val response = chain.proceed(newRequest)
         if(response.header("Authorization") != null){
             // token이 vaild할 경우 sessionId를 저장해줘야함
 //            sessionManager.setSessionId(response.header("Authorization")!!)
-            Timber.tag("login").d("header Authorization : ${response.header("Authorization")!!}")
+            Timber.tag("interceptor").d("header Authorization : ${response.header("Authorization")!!}")
         }
         // token이 invalid 하면  이미 response 객체에 오류가 붙어서 올거임-> NetworkCallAdapter가 그 뒤에 처리할거임
         return response

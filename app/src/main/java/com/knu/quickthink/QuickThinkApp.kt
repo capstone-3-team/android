@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -107,8 +108,23 @@ fun QuickThinkApp(
                                 }
                             )
                         }
-                        composable(route = MainDestination.ACCOUNT_ROUTE) {
-                            AccountScreen()
+                        dialog(
+                            route = MainDestination.ACCOUNT_ROUTE,
+                            dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
+                        ) {
+                            Surface(
+                                modifier = Modifier
+                                    .width(400.dp)
+                                    .wrapContentHeight()
+                                    .padding(dimensionResource(id = R.dimen.vertical_margin))
+                                    .clip(RoundedCornerShape(dimensionResource(id = R.dimen.dialog_roundedCorner)))
+                                ) {
+                                    AccountScreen(
+                                        onCloseClicked = {
+                                            appState.navController.popBackStack()
+                                        }
+                                    )
+                                }
                         }
                         composable(route = MainDestination.CHATGPT_ROUTE) {
                             ChatGPTScreen()
