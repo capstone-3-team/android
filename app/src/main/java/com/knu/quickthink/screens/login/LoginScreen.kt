@@ -41,19 +41,14 @@ fun LoginScreen(
                 Timber.tag("googleLogin").d("rememberLauncherForActivityResult")
                 val gsa = task?.getResult(ApiException::class.java)
                 Timber.tag("googleLogin").d("rememberLauncherForActivityResult : $gsa")
+
                 Timber.tag("googleLogin").d("serverAuthCode : ${gsa?.serverAuthCode}")
                 if (gsa != null) {
                     if (gsa.serverAuthCode == null || gsa.displayName == null || gsa.id == null || gsa.photoUrl == null) {
                         throw NullPointerException("GoogleSignInAccount Data null")
                     } else {
-                        viewModel.fetchSignInUser(
-                            token = gsa.serverAuthCode!!,
-                            googleName = gsa.displayName!!,
-                            googleId = gsa.id!!,
-                            profilePicture = gsa.photoUrl.toString()
-                        )
 //                        Toast.makeText(context,"로그인 성공",Toast.LENGTH_SHORT).show()
-                        viewModel.login()
+                        viewModel.login(gsa)
                     }
                 } else {
                     Toast.makeText(context,"구글 계정을 선택하세요",Toast.LENGTH_SHORT).show()
