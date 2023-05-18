@@ -6,12 +6,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.knu.quickthink.R
 import com.knu.quickthink.network.networkResultCallAdapter.NetworkResultCallAdapterFactory
+import com.knu.quickthink.network.nullOnEmptyConverter.NullOnEmptyConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -32,6 +32,7 @@ object Module{
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
+            .addConverterFactory(NullOnEmptyConverterFactory)
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(NetworkResultCallAdapterFactory.create())
             .build()
@@ -65,6 +66,7 @@ object Module{
     @Singleton
     fun provideGoogleSignInClient(@ApplicationContext context : Context) : GoogleSignInClient{
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestServerAuthCode(context.getString(R.string.gcp_web_client_id))
             .requestIdToken(context.getString(R.string.gcp_web_client_id))
             .requestEmail()
             .build()
