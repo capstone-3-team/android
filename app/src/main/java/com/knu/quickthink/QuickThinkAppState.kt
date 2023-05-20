@@ -35,7 +35,8 @@ class QuickThinkAppState(
     val bottomSheetNavigator :BottomSheetNavigator,
     val coroutineScope :CoroutineScope,
     val sheetState : ModalBottomSheetState,
-    val isMainRoute : MutableState<Boolean> = mutableStateOf(false)
+    val isMainRoute : MutableState<Boolean> = mutableStateOf(false),
+    val menuExpanded : MutableState<Boolean> = mutableStateOf(false),
 ) {
     fun addDestinationChangedListener(
     ){

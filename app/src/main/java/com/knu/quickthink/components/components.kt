@@ -1,5 +1,12 @@
 package com.knu.quickthink.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -85,116 +92,130 @@ fun GoogleLoginButton(
 
 @Composable
 fun QuickThinkTopAppBar(
+    isMainRoute : Boolean,
+    menuExpanded : MutableState<Boolean>,
     onLogoClicked : () -> Unit,
     onSearchClicked : () -> Unit,
     onChatGPTClicked : () -> Unit,
     onAccountClicked : () -> Unit,
     onSignOutClicked : () -> Unit
 ){
-    var menuExpanded by remember {
-        mutableStateOf(false)
-    }
-    TopAppBar(
-        title = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val painter = rememberAsyncImagePainter(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(R.drawable.quickthink_logo)
-                        .crossfade(true)
-                        .build(),
-                )
-                Image(
-                    painter = painter,
-                    contentDescription = "logo Img",
-                    modifier = Modifier.clickable {
-                        onLogoClicked()
-                    }
-//                    modifier = Modifier.size(30.dp)
-                )
-                if (painter.state is AsyncImagePainter.State.Loading ||
-                    painter.state is AsyncImagePainter.State.Error
+    AnimatedVisibility(
+        visible = isMainRoute,
+        enter = slideInVertically(
+            initialOffsetY = {fullHeight ->  -fullHeight},
+            animationSpec = tween(durationMillis = 400, easing = LinearOutSlowInEasing)
+        ),
+        modifier = Modifier.fillMaxWidth().animateContentSize()
+    )
+    {
+        TopAppBar(
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    CircularProgressIndicator()
-                }
-                Spacer(modifier = Modifier.fillMaxWidth())
-            }
-        },
-        actions = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End
-            ) {
-                IconButton(
-                    onClick = onSearchClicked
-                ){
-                    Icon(
-                        imageVector = Icons.Filled.Search,
-                        contentDescription = "search",
+                    val painter = rememberAsyncImagePainter(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(R.drawable.quickthink_logo)
+                            .crossfade(true)
+                            .build(),
                     )
-                }
-//                Spacer(modifier = Modifier.width(5.dp))
-
-                IconButton(
-                    modifier = Modifier.background(Color.White),
-                    onClick = onChatGPTClicked
-                ){
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.outline_chat_24),
-                        contentDescription = "chatgpt",
-                        modifier = Modifier.size(20.dp),
-                    )
-                }
-//                Spacer(modifier = Modifier.width(5.dp))
-                Box(){
-                    IconButton(
-                        onClick = {
-                            menuExpanded = !menuExpanded
+                    Image(
+                        painter = painter,
+                        contentDescription = "logo Img",
+                        modifier = Modifier.clickable {
+                            onLogoClicked()
                         }
+//                    modifier = Modifier.size(30.dp)
+                    )
+                    if (painter.state is AsyncImagePainter.State.Loading ||
+                        painter.state is AsyncImagePainter.State.Error
                     ) {
+                        CircularProgressIndicator()
+                    }
+                    Spacer(modifier = Modifier.fillMaxWidth())
+                }
+            },
+            actions = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    IconButton(
+                        onClick = onSearchClicked
+                    ){
                         Icon(
-                            imageVector = Icons.Filled.Settings,
-                            contentDescription = "settings",
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = "search",
                         )
                     }
+//                Spacer(modifier = Modifier.width(5.dp))
 
-                    DropdownMenu(
-                        expanded = menuExpanded,
-                        onDismissRequest = { menuExpanded = false }
-                    ) {
-                        DropdownMenuItem(
+                    IconButton(
+                        modifier = Modifier.background(Color.White),
+                        onClick = onChatGPTClicked
+                    ){
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.outline_chat_24),
+                            contentDescription = "chatgpt",
+                            modifier = Modifier.size(20.dp),
+                        )
+                    }
+//                Spacer(modifier = Modifier.width(5.dp))
+                    Box(){
+                        IconButton(
                             onClick = {
-                                onAccountClicked()
-                                menuExpanded = false
+                                menuExpanded.value = !menuExpanded.value
                             }
                         ) {
                             Icon(
-                                imageVector = Icons.Filled.Person,
-                                contentDescription = "account",
-                                modifier = Modifier.size(20.dp)
+                                imageVector = Icons.Filled.Settings,
+                                contentDescription = "settings",
                             )
-                            Spacer(modifier = Modifier.width(5.dp))
-                            Text(text = "Account")
                         }
-                        DropdownMenuItem(
-                            onClick = onSignOutClicked
+
+                        DropdownMenu(
+                            expanded = menuExpanded.value,
+                            onDismissRequest = { menuExpanded.value = false }
                         ) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_baseline_exit_to_app_24),
-                                contentDescription = "sign out",
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(5.dp))
-                            Text(text = "Sign Out")
+                            DropdownMenuItem(
+                                onClick = {
+                                    menuExpanded.value = false
+                                    onAccountClicked()
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Person,
+                                    contentDescription = "account",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Text(text = "Account")
+                            }
+                            DropdownMenuItem(
+                                onClick = {
+                                    menuExpanded.value = false
+                                    onSignOutClicked()
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_baseline_exit_to_app_24),
+                                    contentDescription = "sign out",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Text(text = "Sign Out")
+                            }
                         }
                     }
                 }
-            }
-        },
-        backgroundColor = colorResource(id = R.color.white),
-        elevation = 0.dp,
-    )
+            },
+            backgroundColor = colorResource(id = R.color.white),
+            elevation = 0.dp,
+        )
+    }
+
+
 }
 
 @Composable
