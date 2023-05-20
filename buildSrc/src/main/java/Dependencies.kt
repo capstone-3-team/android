@@ -62,6 +62,8 @@ object Dependencies {
     const val KOTLIN_SERIALIZATION = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.KOTLIN_SERIALIZATION}"
 
     const val PREFERENCES_DATASTORE = "androidx.datastore:datastore-preferences:${Versions.DATASTORE}"
+    const val PROTO_DATASTORE = "androidx.datastore:datastore-core:1.0.0"
+    const val PROTOBUF = "com.google.protobuf:protobuf-javalite:${Versions.PROTOBUF}"
 
 //    const val PAGING = "androidx.paging:paging-runtime-ktx:${Versions.PAGING}"
 
