@@ -3,6 +3,7 @@ package com.knu.quickthink.network
 import com.knu.quickthink.model.GoogleUserModel
 import com.knu.quickthink.model.IntroductionResponse
 import com.knu.quickthink.model.NetworkResult
+import com.knu.quickthink.model.TokenValidResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -20,7 +21,14 @@ interface UserApiService {
     suspend fun tokenValidCheck(
         @Query("accessToken") accessToken: String,
         @Query("googleId") googleId: String
-    ) :NetworkResult<Boolean>
+    ) :NetworkResult<TokenValidResponse>
+
+    // 현재 구현 안되어 있음
+    @GET("/api/updateToken")
+    suspend fun updateToken(
+        @Query("accessToken") accessToken: String,
+        @Query("googleId") googleId: String
+    ) :NetworkResult<String>
 
     @GET("/api/profile")
     suspend fun fetchIntroduction(

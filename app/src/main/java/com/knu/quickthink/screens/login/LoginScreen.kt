@@ -20,15 +20,17 @@ import timber.log.Timber
 
 @Composable
 fun LoginScreen(
-    viewModel: GoogleSignInViewModel = hiltViewModel(),
+    viewModel: GoogleSignInViewModel= hiltViewModel(),
     onLoginSuccess: () -> Unit,
     onSignUpClicked: () -> Unit
 ) {
     val context = LocalContext.current
-    val signInRequestCode = 1
+    val signInRequestCode = 1                                               //증 작업의 결과를 처리하는 콜백에서 식별하기 위해 사용
     val isLoading by viewModel.isLoading.collectAsState()
     val isLogInSuccess by viewModel.isLogInSuccess.collectAsState()
+
     LaunchedEffect(isLogInSuccess) {
+        Timber.tag("isLogInSuccess").d("loginSuccess $isLogInSuccess")
         if (isLogInSuccess) {
             Timber.tag("googleLogin").d("loginSuccess")
             onLoginSuccess()
@@ -42,14 +44,9 @@ fun LoginScreen(
                 val gsa = task?.getResult(ApiException::class.java)
                 Timber.tag("googleLogin").d("rememberLauncherForActivityResult : $gsa")
 
-                Timber.tag("googleLogin").d("serverAuthCode : ${gsa?.serverAuthCode}")
                 if (gsa != null) {
-                    if (gsa.serverAuthCode == null || gsa.displayName == null || gsa.id == null || gsa.photoUrl == null) {
-                        throw NullPointerException("GoogleSignInAccount Data null")
-                    } else {
+                    viewModel.login(gsa)
 //                        Toast.makeText(context,"로그인 성공",Toast.LENGTH_SHORT).show()
-                        viewModel.login(gsa)
-                    }
                 } else {
                     Toast.makeText(context,"구글 계정을 선택하세요",Toast.LENGTH_SHORT).show()
                 }
@@ -66,6 +63,7 @@ fun LoginScreen(
     ) {
         if(isLoading){
             Timber.tag("isLoading").d("true")
+//            CircularProgressIndicator()
             LottieImage(rawRes = R.raw.welcome, modifier = Modifier)
         }else {
             Logo()
@@ -84,10 +82,4 @@ fun LoginScreen(
             })
         }
     }
-}
-
-@Composable
-fun showLoadingAnimation() {
-    // Lottie 애니메이션을 표시하는 로직 등을 추가하세요
-    LottieImage(rawRes = R.raw.welcome, modifier = Modifier)
 }
