@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.navOptions
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -25,7 +26,12 @@ import kotlinx.coroutines.delay
 fun SplashScreen(navController: NavController) {
     LaunchedEffect(key1 = true) {
         delay(500L)
-        navController.navigate(MainDestination.LOGIN_ROUTE)
+        navController.navigate(
+            MainDestination.LOGIN_ROUTE,
+            navOptions {
+                popUpTo(MainDestination.SPlASH_ROUTE){ inclusive = true}
+            }
+        )
     }
     Column(
         modifier = Modifier
