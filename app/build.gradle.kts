@@ -156,6 +156,7 @@ dependencies {
     implementation(Dependencies.GOOGLE_AUTH)
 
     implementation(Dependencies.LOTTIE)
+    implementation(Dependencies.RICHTEXT_MARKDOWN)
 
     implementation(Dependencies.PROTO_DATASTORE)
     implementation(Dependencies.PROTOBUF)

@@ -86,4 +86,6 @@ object Dependencies {
     const val LIVEDATA = "androidx.compose.runtime:runtime-livedata:${Versions.COMPOSE_UI}"
 
     const val LOTTIE = "com.airbnb.android:lottie-compose:${Versions.LOTTIE}"
+
+    const val RICHTEXT_MARKDOWN = "com.halilibo.compose-richtext:richtext-commonmark:${Versions.RICHTEXT}"
 }
