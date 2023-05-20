@@ -36,4 +36,8 @@ object Versions {
     const val ACCOMPANIST = "0.28.0"
     const val GOOGLE_AUTH = "20.1.0"
     const val LOTTIE = "6.0.0"
+
+    /* Proto DataStore*/
+    const val PROTOBUF_PLUGIN = "0.8.17"
+    const val PROTOBUF = "3.14.0"
 }

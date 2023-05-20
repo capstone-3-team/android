@@ -1,3 +1,5 @@
+import com.google.protobuf.gradle.*
+
 plugins {
     id (Plugins.ANDROID_APPLICATION)
     id (Plugins.KOTLIN_ANDROID_PLUGIN)
@@ -5,6 +7,7 @@ plugins {
     id (Plugins.SECRETS_GRADLE_PLUGIN)
     id (Plugins.PARCELIZE)
     id (Plugins.KAPT)
+    id (Plugins.PROTOBUF) version Versions.PROTOBUF_PLUGIN
 }
 
 android {
@@ -153,6 +156,24 @@ dependencies {
     implementation(Dependencies.GOOGLE_AUTH)
 
     implementation(Dependencies.LOTTIE)
+
+    implementation(Dependencies.PROTO_DATASTORE)
+    implementation(Dependencies.PROTOBUF)
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.14.0"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.plugins{
+                create("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }
 
 tasks.register("prepareKotlinBuildScriptModel"){}

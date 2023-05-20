@@ -67,8 +67,7 @@ object Module{
     fun provideGoogleSignInClient(@ApplicationContext context : Context) : GoogleSignInClient{
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestServerAuthCode(context.getString(R.string.gcp_web_client_id))
-            .requestIdToken(context.getString(R.string.gcp_web_client_id))
-            .requestEmail()
+            .requestIdToken(context.getString(R.string.gcp_web_client_id))                                  // 이거 받아야지만 프로필 이미지 넘어온다
             .build()
         return GoogleSignIn.getClient(context, gso)
     }
@@ -78,7 +77,6 @@ class AuthInterceptor : Interceptor {
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val newRequest = chain.request().newBuilder()
-//            .addHeader("Authorization", "Bearer $sessionId")
             .addHeader("Content-Type","application/json")
             .build()
 

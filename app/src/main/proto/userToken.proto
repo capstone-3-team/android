@@ -1,0 +1,9 @@
+syntax = "proto3" ;
+
+option java_package = "com.knu.quickthink";
+option java_multiple_files = true;
+
+message UserToken{
+  string token = 1;
+  string googleId = 2;
+}
