@@ -1,8 +1,6 @@
 package com.knu.quickthink
 
 import android.app.Activity
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -16,7 +14,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.Navigation
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
@@ -32,7 +29,7 @@ import com.knu.quickthink.ui.theme.QuickThinkTheme
 import kotlinx.coroutines.launch
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.bottomSheet
-import com.knu.quickthink.screens.login.GoogleSignInViewModel
+import com.knu.quickthink.screens.card.CardEditScreen
 import com.knu.quickthink.screens.login.LoginScreen
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialNavigationApi::class,ExperimentalComposeUiApi::class)
@@ -106,6 +103,9 @@ fun QuickThinkApp(
                             FeedScreen(
                                 onCardClick = {
                                     appState.navController.navigate(MainDestination.CARD_VIEW_ROUTE)
+                                },
+                                onCardEditClick = {
+                                    appState.navController.navigate(MainDestination.CARD_EDIT_ROUTE)
                                 }
                             )
                         }
@@ -151,6 +151,11 @@ fun QuickThinkApp(
                             ) {
                                 CardViewScreen()
                             }
+                        }
+                        composable(route = MainDestination.CARD_EDIT_ROUTE){
+                            CardEditScreen(
+                                onBackClicked = {appState.navController.navigate(MainDestination.MAIN_ROUTE)},
+                                onDoneClicked = {appState.navController.navigate(MainDestination.MAIN_ROUTE)})
                         }
                     }
                 }
