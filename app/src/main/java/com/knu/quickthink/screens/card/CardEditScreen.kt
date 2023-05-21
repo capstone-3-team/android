@@ -2,21 +2,20 @@ package com.knu.quickthink.screens.card
 
 import android.app.Activity
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.*
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,134 +26,262 @@ import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.ui.RichText
 import com.knu.quickthink.R
 import com.knu.quickthink.screens.main.addFocusCleaner
+import kotlinx.coroutines.delay
 import timber.log.Timber
 
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CardEditScreen(
-    viewModel: CardViewModel = hiltViewModel()
+    viewModel: CardViewModel = hiltViewModel(),
+    onBackClicked: () -> Unit,
+    onDoneClicked: () -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val content by viewModel.content.collectAsState()
-    val isEditing by viewModel.isEditing.collectAsState()
+    val isContentEditing by viewModel.isContentEditing.collectAsState()
     val isPreview by viewModel.isPreview.collectAsState()
-    val context = LocalContext.current
-
-    // 키보드에 따라 window크기 조절을 위해 필요한 부분으로 이해함
-    DisposableEffect(Unit) {
-        val window = (context as? Activity)?.window
-        if (window != null) {
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-        }
-        onDispose { }
-    }
+    val title by viewModel.title.collectAsState()
     val isKeyboardOpen by keyboardAsState()
-    val focusRequester = remember { FocusRequester() }
     val scrollState = rememberScrollState()
-    val lineHeightPx = with(LocalDensity.current) { 24.dp.toPx() }
+    val interactionSource = remember { MutableInteractionSource() }
+//    val focusRequester = remember { FocusRequester() }
+
+    val context = LocalContext.current
+    val lineHeightPx = with(LocalDensity.current) { 16.dp.toPx() }
     val imeHeight = WindowInsets.ime.getBottom(LocalDensity.current)
 //    Timber.tag("cardEdit").d("imeBottom $imeHeight")
-    val interactionSource = remember { MutableInteractionSource() }
     val focusManager = LocalFocusManager.current
 
-
-    LaunchedEffect(isEditing) {
-        Timber.tag("cardEdit").d("LaunchedEffect isEditing $isEditing")
-        if (isEditing) {
-            /* isEditing true일 경우 텍스트필드에 focus 넣어주기 */
-//            focusRequester.requestFocus()
-//            scrollState.animateScrollTo(cursorPositionToPixelOffset(content,content.selection.start,lineHeightPx))    // 적용 잘 안됨
-        }
-    }
-
-    /*
-    * TODO : View로 돌아가기 버튼 있어야할 듯 탭으로 주거나(github PR 쓰는거처럼)
-    * 현재는 커서 위치 정하고 수정한 후에 키보드 내리면 자동저장되는 시스템
-    * 커서 위치 무조건 정해야 나갈 수 있는데 커서 위치 정하기 전에 돌아갈 수 있도록 만드는게 좋다
-    * */
-
+    // 키보드 닫혔을 때 clearFocus && updateContent
     LaunchedEffect(isKeyboardOpen) {
         Timber.tag("cardEdit").d("LaunchedEffect isKeyboardOpen $isKeyboardOpen")
         if (!isKeyboardOpen) {
             focusManager.clearFocus()
             viewModel.updateContent()
-        }
-        if(isKeyboardOpen){
-            scrollState.animateScrollTo(cursorPositionToPixelOffset(content,content.selection.start,lineHeightPx))
+        }else{
+            scrollState.animateScrollTo(
+                cursorPositionToPixelOffset(content,content.selection.start,lineHeightPx),
+            )
         }
     }
-
+    // 커서 위치에 따라 스크롤 처리
     LaunchedEffect(content) {
         Timber.tag("cardEdit").d("LauncedEffect content.selection : ${content.selection} ")
         scrollState.animateScrollTo(
-            cursorPositionToPixelOffset(
-                content,
-                content.selection.start,
-                lineHeightPx
-            )
+            cursorPositionToPixelOffset(content,content.selection.start,lineHeightPx),
         )
     }
+    // 키보드에 따라 window크기 조절을 위해 필요한 부분으로 이해함
+    val window = (context as? Activity)?.window
+    if (window != null) {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+    }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(dimensionResource(id = R.dimen.vertical_margin))
-            .imePadding()
-            .addFocusCleaner(keyboardController!!)
-    ) {
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { viewModel.reverseIsPreview() }
-        ) {
-            Text(text = "preview")
+    val menuExpanded = remember { mutableStateOf(false) }
+    Scaffold(
+        modifier = Modifier.systemBarsPadding(),
+        topBar = {
+            CardEditTopAppBar(
+                isPreview = isPreview,
+                menuExpanded = menuExpanded,
+                onBackClicked = {
+                    onBackClicked()
+                },
+                onPreviewEditClicked = {
+                    viewModel.reverseIsPreview()
+                },
+                onDeleteClicked = {},
+            )
         }
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = "제목",
-            textStyle = MaterialTheme.typography.h5,
-            enabled = !isPreview,
-            onValueChange = {}
-        )
-        Crossfade(
-            modifier = Modifier.verticalScroll(scrollState),
-            targetState = isPreview
-        ) { targetState ->
-            when (targetState) {
-                false -> {
-                    OutlinedTextField(
-                        value = content,
-                        onValueChange = { textFieldValue ->
-                            viewModel.editContent(textFieldValue)
-                        },
-                        placeholder = { Text("카드 내용을 입력해주세요") },
-                        modifier = Modifier
-                            .focusRequester(focusRequester)
-                            .onFocusChanged { focusState ->
-                                if (focusState.isFocused) {
-                                    viewModel.startEditing()
-                                }
-                            }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(0.7f)
+                    .fillMaxSize()
+                    .background(Color.White)
+                    .padding(paddingValues)
+                    .padding(
+                        start = dimensionResource(id = R.dimen.horizontal_margin),
+                        end = dimensionResource(id = R.dimen.horizontal_margin),
+                        bottom = dimensionResource(id = R.dimen.vertical_margin),
                     )
-                }
-                true -> {
-                    RichText(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clickable(
-                                interactionSource = interactionSource,
-                                indication = null                                            // 클릭 꾹 누르면 검은색으로 변하는 상호작용 없애주기 위함
+                    .addFocusCleaner(keyboardController!!)
+            ) {
+                TextField(
+                    modifier = Modifier.fillMaxWidth()
+//                        .border(BorderStroke(2.dp,color =Color.LightGray) , shape = MaterialTheme.shapes.small)
+                    ,
+                    value = title,
+                    textStyle = MaterialTheme.typography.h5,
+                    enabled = !isPreview,
+                    singleLine = true,
+                    onValueChange = { viewModel.editTitle(it) },
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Blue,
+                        unfocusedIndicatorColor = Color.LightGray,
+                        disabledTextColor = Color.Black,
+                        disabledIndicatorColor = Color.LightGray
+                    ),
+                )
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.vertical_margin)))
+                Crossfade(
+                    modifier = Modifier,
+                    targetState = isPreview
+                ) { targetState ->
+                    when (targetState) {
+                        false -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .border(
+                                        width = 2.dp,
+                                        color = if (isContentEditing) Color.Blue else Color.LightGray,
+                                        shape = MaterialTheme.shapes.small
+                                    )
                             ) {
-                                viewModel.reverseIsPreview()
+                                OutlinedTextField(
+                                    value = content,
+                                    modifier = Modifier
+                                        .verticalScroll(scrollState)
+                                        .imePadding()
+//                                        .focusRequester(focusRequester)
+                                        .onFocusChanged { focusState ->
+                                            if(focusState.isFocused){
+                                                viewModel.startEditing()
+                                            }else{
+                                                viewModel.finishEditing()
+                                            }
+                                        },
+                                    onValueChange = { textFieldValue ->
+                                        viewModel.editContent(textFieldValue)
+                                    },
+                                    placeholder = { Text("카드 내용을 입력해주세요") },
+                                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                                        backgroundColor = Color.Transparent,
+                                        focusedBorderColor = Color.Transparent,
+                                        unfocusedBorderColor = Color.Transparent
+                                    ),
+                                    shape = MaterialTheme.shapes.small
+                                )
                             }
-                    ) {
-                        Markdown(content = content.text)
+                        }
+                        true -> {
+                            RichText(
+                                modifier = Modifier
+                                    .verticalScroll(scrollState)
+                                    .fillMaxSize()
+                                    .clickable(
+                                        interactionSource = interactionSource,
+                                        indication = null                                            // 클릭 꾹 누르면 검은색으로 변하는 상호작용 없애주기 위함
+                                    ) {
+                                        viewModel.reverseIsPreview()
+                                    }
+                            ) {
+                                Markdown(content = content.text)
+                            }
+                        }
                     }
                 }
             }
+
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.3f),
+                onClick = onDoneClicked
+            ) {
+                Text(text = "Done")
+            }
+
         }
+
     }
+
+}
+
+@Composable
+fun CardEditTopAppBar(
+    isPreview : Boolean,
+    menuExpanded : MutableState<Boolean>,
+    onBackClicked: () -> Unit,
+    onPreviewEditClicked : () -> Unit,
+    onDeleteClicked : () -> Unit,
+) {
+    TopAppBar(
+        title = { },
+        navigationIcon = {
+            IconButton(onClick =onBackClicked) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "arrowBack"
+                )
+            }
+        },
+        actions = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ) {
+                Crossfade(targetState = isPreview) { isPreview ->
+                    IconButton(
+                        onClick = onPreviewEditClicked
+                    ){
+                        if(isPreview){
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "edit",
+                            )
+                        }else{
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "show preview",
+                            )
+                        }
+                    }
+                }
+//                Spacer(modifier = Modifier.width(5.dp))
+                Box(){
+                    IconButton(
+                        onClick = {
+                            menuExpanded.value = !menuExpanded.value
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "moreVert",
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = menuExpanded.value,
+                        onDismissRequest = { menuExpanded.value = false }
+                    ) {
+                        DropdownMenuItem(
+                            onClick = {
+                                menuExpanded.value = false
+                                onDeleteClicked()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "delete",
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(5.dp))
+                            Text(text = "Delete")
+                        }
+                    }
+                }
+            }
+        },
+        backgroundColor = colorResource(id = R.color.white),
+        elevation = 0.dp,
+    )
 }
 
 @Composable
@@ -168,9 +295,9 @@ private fun cursorPositionToPixelOffset(
     cursorPosition: Int,
     lineHeightPx: Float
 ): Int {
-    val lines = textFieldValue.text.split("\n")
-
+    val lines = textFieldValue.text.split("\n")                         // 가로 크기 계산해서 한 줄 넘어갔을 때도 split해줄 수 있다면 정말 베스트인데 일단 패스
     var offset = 0
+    var line_num = 0
 
     for (element in lines) {
 //        Timber.tag("cardEdit").d("element : $element")
@@ -182,19 +309,40 @@ private fun cursorPositionToPixelOffset(
             offset -= element.length
             break
         }
-
         // Add 1 to account for the line break character
         offset++
+        line_num++
     }
 
     // Calculate the pixel offset based on line height
-    return (offset / lines.size.toFloat() * lineHeightPx).toInt()
+    return (line_num.toFloat() * lineHeightPx).toInt()
+//    return (offset / lines.size.toFloat() * lineHeightPx).toInt()
+}
+
+@Preview(showBackground = true,)
+@Composable
+fun CardEditPrev() {
+    Surface {
+        CardEditScreen(onBackClicked = {}, onDoneClicked = {})
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun CardEditPrev() {
-    Surface {
-        CardEditScreen()
+fun CardEditTopAppBarPrev() {
+    Surface() {
+        val menuExpanded = remember {
+            mutableStateOf(false)
+        }
+        val isPreView = remember {
+            mutableStateOf(false)
+        }
+        CardEditTopAppBar(
+            isPreview = false,
+            menuExpanded = menuExpanded,
+            onBackClicked = { /*TODO*/ },
+            onPreviewEditClicked = { /*TODO*/ },
+            onDeleteClicked = { /*TODO*/ },
+        )
     }
 }

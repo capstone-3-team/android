@@ -12,11 +12,14 @@ import javax.inject.Inject
 @HiltViewModel
 class CardViewModel @Inject constructor(
 ): ViewModel(){
+    private val _title = MutableStateFlow("")
+    val title : StateFlow<String> = _title.asStateFlow()
+
     private val _content = MutableStateFlow(TextFieldValue(text = ""))
     val content : StateFlow<TextFieldValue> = _content.asStateFlow()
 
-    private val _isEditing = MutableStateFlow(false)
-    val isEditing : StateFlow<Boolean> = _isEditing.asStateFlow()
+    private val _isContentEditing = MutableStateFlow(false)
+    val isContentEditing : StateFlow<Boolean> = _isContentEditing.asStateFlow()
 
     private val _isPreview = MutableStateFlow(false)
     val isPreview : StateFlow<Boolean> = _isPreview.asStateFlow()
@@ -29,21 +32,32 @@ class CardViewModel @Inject constructor(
         _content.value = newContent
     }
 
+    fun editTitle (newTitle : String){
+        _title.value = newTitle
+    }
+
     fun startEditing(){
         Timber.tag("cardEdit").d("startEdit")
-        _isEditing.value = true
+        _isContentEditing.value = true
+    }
+
+    fun  finishEditing(){
+        _isContentEditing.value = false
     }
 
     fun reverseIsPreview(){
         _isPreview.value = !_isPreview.value
+        _isContentEditing.value = !_isPreview.value
     }
 
 
     fun updateContent(){
-        _isEditing.value = false
+
+        _isContentEditing.value = false
     }
 
     fun fetchContent(){
+        _title.value = "제목"
         _content.value = _content.value.copy(text = testMarkdown)
     }
     /* TODO : fetchContent  -> 처음 카드 내용 가져오기*/
