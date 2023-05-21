@@ -2,8 +2,6 @@ package com.knu.quickthink.screens.card
 
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.knu.quickthink.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +18,9 @@ class CardViewModel @Inject constructor(
     private val _isEditing = MutableStateFlow(false)
     val isEditing : StateFlow<Boolean> = _isEditing.asStateFlow()
 
+    private val _isPreview = MutableStateFlow(false)
+    val isPreview : StateFlow<Boolean> = _isPreview.asStateFlow()
+
     init {
         fetchContent()
     }
@@ -28,10 +29,15 @@ class CardViewModel @Inject constructor(
         _content.value = newContent
     }
 
-    fun startEdit(){
+    fun startEditing(){
         Timber.tag("cardEdit").d("startEdit")
         _isEditing.value = true
     }
+
+    fun reverseIsPreview(){
+        _isPreview.value = !_isPreview.value
+    }
+
 
     fun updateContent(){
         _isEditing.value = false

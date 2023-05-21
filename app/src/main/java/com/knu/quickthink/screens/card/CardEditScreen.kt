@@ -2,32 +2,24 @@ package com.knu.quickthink.screens.card
 
 import android.app.Activity
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusOrder
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,9 +27,7 @@ import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.ui.RichText
 import com.knu.quickthink.R
 import com.knu.quickthink.screens.main.addFocusCleaner
-import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
-import java.time.format.TextStyle
 
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -48,6 +38,7 @@ fun CardEditScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val content by viewModel.content.collectAsState()
     val isEditing by viewModel.isEditing.collectAsState()
+    val isPreview by viewModel.isPreview.collectAsState()
     val context = LocalContext.current
 
     // 키보드에 따라 window크기 조절을 위해 필요한 부분으로 이해함
@@ -63,8 +54,9 @@ fun CardEditScreen(
     val scrollState = rememberScrollState()
     val lineHeightPx = with(LocalDensity.current) { 24.dp.toPx() }
     val imeHeight = WindowInsets.ime.getBottom(LocalDensity.current)
-    Timber.tag("cardEdit").d("imeBottom $imeHeight")
-    val interactionSource = remember{ MutableInteractionSource() }
+//    Timber.tag("cardEdit").d("imeBottom $imeHeight")
+    val interactionSource = remember { MutableInteractionSource() }
+    val focusManager = LocalFocusManager.current
 
 
     LaunchedEffect(isEditing) {
@@ -83,8 +75,13 @@ fun CardEditScreen(
     * */
 
     LaunchedEffect(isKeyboardOpen) {
+        Timber.tag("cardEdit").d("LaunchedEffect isKeyboardOpen $isKeyboardOpen")
         if (!isKeyboardOpen) {
+            focusManager.clearFocus()
             viewModel.updateContent()
+        }
+        if(isKeyboardOpen){
+            scrollState.animateScrollTo(cursorPositionToPixelOffset(content,content.selection.start,lineHeightPx))
         }
     }
 
@@ -105,18 +102,27 @@ fun CardEditScreen(
             .background(Color.White)
             .padding(dimensionResource(id = R.dimen.vertical_margin))
             .imePadding()
-            .verticalScroll(scrollState)
             .addFocusCleaner(keyboardController!!)
     ) {
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { viewModel.reverseIsPreview() }
+        ) {
+            Text(text = "preview")
+        }
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = "제목",
             textStyle = MaterialTheme.typography.h5,
+            enabled = !isPreview,
             onValueChange = {}
         )
-        Crossfade(targetState = isEditing) { targetState ->
+        Crossfade(
+            modifier = Modifier.verticalScroll(scrollState),
+            targetState = isPreview
+        ) { targetState ->
             when (targetState) {
-                true -> {
+                false -> {
                     OutlinedTextField(
                         value = content,
                         onValueChange = { textFieldValue ->
@@ -125,9 +131,14 @@ fun CardEditScreen(
                         placeholder = { Text("카드 내용을 입력해주세요") },
                         modifier = Modifier
                             .focusRequester(focusRequester)
+                            .onFocusChanged { focusState ->
+                                if (focusState.isFocused) {
+                                    viewModel.startEditing()
+                                }
+                            }
                     )
                 }
-                false -> {
+                true -> {
                     RichText(
                         modifier = Modifier
                             .fillMaxSize()
@@ -135,7 +146,7 @@ fun CardEditScreen(
                                 interactionSource = interactionSource,
                                 indication = null                                            // 클릭 꾹 누르면 검은색으로 변하는 상호작용 없애주기 위함
                             ) {
-                                viewModel.startEdit()
+                                viewModel.reverseIsPreview()
                             }
                     ) {
                         Markdown(content = content.text)
@@ -162,7 +173,7 @@ private fun cursorPositionToPixelOffset(
     var offset = 0
 
     for (element in lines) {
-        Timber.tag("cardEdit").d("element : $element")
+//        Timber.tag("cardEdit").d("element : $element")
         offset += element.length
 
         if (offset >= cursorPosition) {
