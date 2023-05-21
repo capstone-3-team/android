@@ -6,6 +6,8 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -20,6 +22,7 @@ import androidx.compose.ui.focus.focusOrder
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -61,6 +64,7 @@ fun CardEditScreen(
     val lineHeightPx = with(LocalDensity.current) { 24.dp.toPx() }
     val imeHeight = WindowInsets.ime.getBottom(LocalDensity.current)
     Timber.tag("cardEdit").d("imeBottom $imeHeight")
+    val interactionSource = remember{ MutableInteractionSource() }
 
 
     LaunchedEffect(isEditing) {
@@ -127,8 +131,10 @@ fun CardEditScreen(
                     RichText(
                         modifier = Modifier
                             .fillMaxSize()
-                            .clickable {
-                                /*TODO : 클릭 꾹 누르면 검은색으로 변하는데 그거 없애줘야함*/
+                            .clickable(
+                                interactionSource = interactionSource,
+                                indication = null                                            // 클릭 꾹 누르면 검은색으로 변하는 상호작용 없애주기 위함
+                            ) {
                                 viewModel.startEdit()
                             }
                     ) {
