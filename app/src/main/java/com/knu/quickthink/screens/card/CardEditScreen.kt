@@ -5,6 +5,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -12,46 +13,82 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.Paragraph
+import androidx.compose.ui.text.ParagraphIntrinsics
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.*
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.ui.RichText
 import com.knu.quickthink.R
+import com.knu.quickthink.components.HashTagTextField
 import com.knu.quickthink.screens.main.addFocusCleaner
-import kotlinx.coroutines.delay
+import com.knu.quickthink.screens.main.testCard
 import timber.log.Timber
 
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun CardEditScreen(
     viewModel: CardViewModel = hiltViewModel(),
     onBackClicked: () -> Unit,
     onDoneClicked: () -> Unit
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current
     val content by viewModel.content.collectAsState()
+    val extractedText = extractTextUntilCursor(content)
     val isContentEditing by viewModel.isContentEditing.collectAsState()
     val isPreview by viewModel.isPreview.collectAsState()
     val title by viewModel.title.collectAsState()
     val isKeyboardOpen by keyboardAsState()
     val scrollState = rememberScrollState()
     val interactionSource = remember { MutableInteractionSource() }
-//    val focusRequester = remember { FocusRequester() }
-
+    var isHashTagTextFieldFocused by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
     val context = LocalContext.current
-    val lineHeightPx = with(LocalDensity.current) { 16.dp.toPx() }
+    val focusManager = LocalFocusManager.current
+
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }                      // ExperimentalFoundationApi임, adjustResize manifest에 무조건 추가해줘야함
+    val coroutineScope = rememberCoroutineScope()
     val imeHeight = WindowInsets.ime.getBottom(LocalDensity.current)
 //    Timber.tag("cardEdit").d("imeBottom $imeHeight")
-    val focusManager = LocalFocusManager.current
+
+    val contentTextStyle = TextStyle(
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Normal,
+        lineHeight = 20.sp,
+        textAlign = TextAlign.Start
+    )
+    val lineHeightPx = with(LocalDensity.current) { 20.sp.toPx() }
+
+    /* TODO: 밑에 들어가는 컨텐츠 크기만큼 유동적으로 패딩 설정  일단은 임시로 값 넣음*/
+    val contentImePadding = if (!isHashTagTextFieldFocused) {
+        WindowInsets.ime.asPaddingValues(LocalDensity.current)
+            .calculateBottomPadding()
+            .coerceAtMost(200.dp)
+    } else 0.dp
+    val hashTagImePadding = if (isHashTagTextFieldFocused) {
+        WindowInsets.ime.asPaddingValues(LocalDensity.current)
+            .calculateBottomPadding()
+            .coerceAtMost(100.dp)
+    } else 0.dp
+    Timber.tag("ime").d("${contentImePadding}")
+    Timber.tag("ime").d("hasTagClicked :${isHashTagTextFieldFocused}")
 
     // 키보드 닫혔을 때 clearFocus && updateContent
     LaunchedEffect(isKeyboardOpen) {
@@ -59,18 +96,7 @@ fun CardEditScreen(
         if (!isKeyboardOpen) {
             focusManager.clearFocus()
             viewModel.updateContent()
-        }else{
-            scrollState.animateScrollTo(
-                cursorPositionToPixelOffset(content,content.selection.start,lineHeightPx),
-            )
         }
-    }
-    // 커서 위치에 따라 스크롤 처리
-    LaunchedEffect(content) {
-        Timber.tag("cardEdit").d("LauncedEffect content.selection : ${content.selection} ")
-        scrollState.animateScrollTo(
-            cursorPositionToPixelOffset(content,content.selection.start,lineHeightPx),
-        )
     }
     // 키보드에 따라 window크기 조절을 위해 필요한 부분으로 이해함
     val window = (context as? Activity)?.window
@@ -107,9 +133,8 @@ fun CardEditScreen(
                     .padding(
                         start = dimensionResource(id = R.dimen.horizontal_margin),
                         end = dimensionResource(id = R.dimen.horizontal_margin),
-                        bottom = dimensionResource(id = R.dimen.vertical_margin),
                     )
-                    .addFocusCleaner(keyboardController!!)
+//                    .addFocusCleaner(keyboardController!!)
             ) {
                 TextField(
                     modifier = Modifier.fillMaxWidth()
@@ -130,12 +155,13 @@ fun CardEditScreen(
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.vertical_margin)))
                 Crossfade(
-                    modifier = Modifier,
+                    modifier = Modifier
+                        .padding(bottom = contentImePadding),
                     targetState = isPreview
                 ) { targetState ->
                     when (targetState) {
                         false -> {
-                            Box(
+                            BoxWithConstraints(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .border(
@@ -144,30 +170,62 @@ fun CardEditScreen(
                                         shape = MaterialTheme.shapes.small
                                     )
                             ) {
-                                OutlinedTextField(
-                                    value = content,
-                                    modifier = Modifier
-                                        .verticalScroll(scrollState)
-                                        .imePadding()
-//                                        .focusRequester(focusRequester)
-                                        .onFocusChanged { focusState ->
-                                            if(focusState.isFocused){
-                                                viewModel.startEditing()
-                                            }else{
-                                                viewModel.finishEditing()
-                                            }
-                                        },
-                                    onValueChange = { textFieldValue ->
-                                        viewModel.editContent(textFieldValue)
-                                    },
-                                    placeholder = { Text("카드 내용을 입력해주세요") },
-                                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                                        backgroundColor = Color.Transparent,
-                                        focusedBorderColor = Color.Transparent,
-                                        unfocusedBorderColor = Color.Transparent
-                                    ),
-                                    shape = MaterialTheme.shapes.small
+                                val horizontalPadding = with(LocalDensity.current){
+                                    2 * dimensionResource(id = R.dimen.horizontal_margin).toPx().toInt()
+                                }
+                                val paragraph = calculateParagraph(
+                                    text = extractedText,
+                                    maxWidth = constraints.maxWidth - horizontalPadding ,
+                                    textStyle = contentTextStyle
                                 )
+//                                Timber.tag("paragraph").d("${paragraph.lineCount}")
+//                                Timber.tag("paragraph").d("${paragraph.height}")
+                                /* 커서 위치에 따라 스크롤 처리 */
+                                LaunchedEffect(content){
+                                    scrollState.animateScrollTo(
+                                        (paragraph.lineCount-1) * lineHeightPx.toInt()
+                                    )
+                                }
+                                Column(
+                                    modifier = Modifier.fillMaxSize()
+                                ){
+                                    OutlinedTextField(
+                                        value = content,
+                                        modifier = Modifier
+                                            .verticalScroll(scrollState)
+                                            .focusRequester(focusRequester)
+                                            .onFocusChanged { focusState ->
+                                                if (focusState.isFocused) {
+                                                    viewModel.startEditing()
+                                                } else {
+                                                    viewModel.finishEditing()
+                                                }
+                                            },
+                                        onValueChange = { textFieldValue ->
+                                            viewModel.editContent(textFieldValue)
+                                        },
+                                        textStyle = contentTextStyle,
+                                        placeholder = { Text("카드 내용을 입력해주세요") },
+                                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                                            backgroundColor = Color.Transparent,
+                                            focusedBorderColor = Color.Transparent,
+                                            unfocusedBorderColor = Color.Transparent
+                                        ),
+                                        shape = MaterialTheme.shapes.small
+                                    )
+                                    Box(
+                                        Modifier.fillMaxSize()
+                                            .clickable(
+                                                interactionSource = interactionSource,
+                                                indication = null
+                                            ){
+                                                focusRequester.requestFocus()
+                                            }
+                                    ){
+
+                                    }
+
+                                }
                             }
                         }
                         true -> {
@@ -184,25 +242,87 @@ fun CardEditScreen(
                             ) {
                                 Markdown(content = content.text)
                             }
-                        }
                     }
                 }
             }
+        }
+        Column(
+            modifier = Modifier
 
-            Button(
+//                  .then(if(isHashTagTextFieldFocused)Modifier.imePadding() else Modifier)
+        ) {
+//                if(!isContentEditing){
+            HashTagTextField(
+                card = testCard,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.3f),
-                onClick = onDoneClicked
-            ) {
-                Text(text = "Done")
-            }
+                    .padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin))
+                    .padding(bottom = hashTagImePadding)
+                    /* TODO : HashTagTextField를 클릭했을 때 키보드가 올라오는데 카보드 바로 위에 텍스트 필드가 있었으면 좋겠음 */
 
+//                            .bringIntoViewRequester(bringIntoViewRequester)
+                    .onFocusEvent { focusState ->
+                        Timber
+                            .tag("focus")
+                            .d("focusState.isFocused : ${focusState.isFocused}")
+                        Timber
+                            .tag("focus")
+                            .d("focusState.hasFocus : ${focusState.hasFocus}")
+                        /*TODO : 포커스처리만 해줘야함  */
+                        isHashTagTextFieldFocused =
+                            focusState.isFocused || focusState.hasFocus
+//                                if (focusState.isFocused) {
+//                                    isHashTagTextFieldFocused = true
+//                                    coroutineScope.launch {
+//                                        bringIntoViewRequester.bringIntoView()
+//                                    }
+//                                }
+                    },
+                onChipClicked = { _, _ -> },
+                onDeleteButtonClicked = { _, _ -> }
+            )
+//                }
         }
-
+        Button(
+            onClick = { /*TODO*/ },
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.1f)
+                .padding(dimensionResource(id = R.dimen.vertical_margin))
+        ) {
+            Text(
+                text = "Done",
+                style = MaterialTheme.typography.h6,
+                color = Color.White
+            )
+        }
     }
 
+    }
 }
+
+/**
+ * textField의 정보에 따라 Paragrah (속성) 반환
+ * */
+@Composable
+fun calculateParagraph(
+    text: String,
+    maxWidth : Int,
+    textStyle : TextStyle
+) :Paragraph = Paragraph(
+    paragraphIntrinsics = ParagraphIntrinsics(
+        text = text,
+        style = textStyle,
+        density = LocalDensity.current,
+        fontFamilyResolver = createFontFamilyResolver(LocalContext.current)
+    ),
+    constraints = Constraints(
+        minWidth = 0,
+        maxWidth = maxWidth,
+        minHeight = 0,
+        maxHeight = Constraints.Infinity
+    )
+)
 
 @Composable
 fun CardEditTopAppBar(
@@ -290,34 +410,12 @@ fun keyboardAsState(): State<Boolean> {
     return rememberUpdatedState(isImeVisible)
 }
 
-private fun cursorPositionToPixelOffset(
-    textFieldValue: TextFieldValue,
-    cursorPosition: Int,
-    lineHeightPx: Float
-): Int {
-    val lines = textFieldValue.text.split("\n")                         // 가로 크기 계산해서 한 줄 넘어갔을 때도 split해줄 수 있다면 정말 베스트인데 일단 패스
-    var offset = 0
-    var line_num = 0
-
-    for (element in lines) {
-//        Timber.tag("cardEdit").d("element : $element")
-        offset += element.length
-
-        if (offset >= cursorPosition) {
-            // Subtract the length of the current line from the offset
-            // to get the offset within the line itself
-            offset -= element.length
-            break
-        }
-        // Add 1 to account for the line break character
-        offset++
-        line_num++
-    }
-
-    // Calculate the pixel offset based on line height
-    return (line_num.toFloat() * lineHeightPx).toInt()
-//    return (offset / lines.size.toFloat() * lineHeightPx).toInt()
+fun extractTextUntilCursor(textFieldValue: TextFieldValue): String {
+    val text = textFieldValue.text
+    val selectionStart = textFieldValue.selection.start
+    return text.substring(0, selectionStart)
 }
+
 
 @Preview(showBackground = true,)
 @Composable
@@ -327,7 +425,7 @@ fun CardEditPrev() {
     }
 }
 
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
 fun CardEditTopAppBarPrev() {
     Surface() {
