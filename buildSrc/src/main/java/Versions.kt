@@ -7,6 +7,7 @@ object Versions {
     /* Androidx */
     const val CORE_KTX = "1.9.0"
     const val MATERIAL = "1.3.1"
+    const val MATERIAL3 = "1.0.1"
     const val COMPOSE_UI = "1.3.3"
     const val COMPOSE_NAVIGATION = "2.5.3"
 
@@ -36,9 +37,13 @@ object Versions {
     const val ACCOMPANIST = "0.28.0"
     const val GOOGLE_AUTH = "20.1.0"
     const val LOTTIE = "6.0.0"
-    const val RICHTEXT = "0.16.0"                        // markdown 개인 라이브러리를 사용하기위함
 
     /* Proto DataStore*/
     const val PROTOBUF_PLUGIN = "0.8.17"
     const val PROTOBUF = "3.14.0"
+
+    /* Personal Library*/
+    const val RICHTEXT = "0.16.0"                        // markdown
+    const val CHIP_TEXTFIELD = "0.4.6"
+
 }
