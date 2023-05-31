@@ -29,6 +29,7 @@ import com.knu.quickthink.ui.theme.QuickThinkTheme
 import kotlinx.coroutines.launch
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.bottomSheet
+import com.knu.quickthink.screens.account.AccountScreen
 import com.knu.quickthink.screens.card.CardEditScreen
 import com.knu.quickthink.screens.login.LoginScreen
 
