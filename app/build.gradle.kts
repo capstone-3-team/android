@@ -67,6 +67,7 @@ dependencies {
     implementation (Dependencies.COMPOSE_UI)
     implementation (Dependencies.COMPOSE_UI_PREVIEW)
     implementation (Dependencies.COMPOSE_MATERIAL)
+    implementation (Dependencies.COMPOSE_MATERIAL3)
     implementation(Dependencies.FLOWLAYOUT)
 
     // Test
@@ -159,6 +160,10 @@ dependencies {
 
     implementation(Dependencies.PROTO_DATASTORE)
     implementation(Dependencies.PROTOBUF)
+
+    /* Personal Library*/
+    implementation(Dependencies.RICHTEXT_MARKDOWN)
+    implementation(Dependencies.CHIP_TEXTFIELD)
 }
 
 protobuf {

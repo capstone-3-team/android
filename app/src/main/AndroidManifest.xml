@@ -15,6 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.QuickThink"
         tools:targetApi="31">
+<!--        android:windowSoftInputMode="adjustResize"-->
         <activity
             android:name="com.knu.quickthink.MainActivity"
             android:exported="true"

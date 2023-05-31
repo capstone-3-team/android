@@ -1,6 +1,7 @@
 object Dependencies {
     const val CORE_KTX = "androidx.core:core-ktx:${Versions.CORE_KTX}"
     const val COMPOSE_MATERIAL = "androidx.compose.material:material:${Versions.MATERIAL}"
+    const val COMPOSE_MATERIAL3 ="androidx.compose.material3:material3:${Versions.MATERIAL3}"
 
     /* Timber */
     const val TIMBER = "com.jakewharton.timber:timber:${Versions.TIMBER}"
@@ -86,4 +87,8 @@ object Dependencies {
     const val LIVEDATA = "androidx.compose.runtime:runtime-livedata:${Versions.COMPOSE_UI}"
 
     const val LOTTIE = "com.airbnb.android:lottie-compose:${Versions.LOTTIE}"
+
+    /* Personal Library*/
+    const val RICHTEXT_MARKDOWN = "com.halilibo.compose-richtext:richtext-commonmark:${Versions.RICHTEXT}"
+    const val CHIP_TEXTFIELD = "io.github.dokar3:chiptextfield:${Versions.CHIP_TEXTFIELD}"
 }

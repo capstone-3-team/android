@@ -10,4 +10,6 @@ object MainDestination{
     const val SERACH_ROUTE = "main/search"
     const val ACCOUNT_ROUTE = "main/account"
     const val CARD_VIEW_ROUTE = "main/cardview"
+    const val CARD_EDIT_ROUTE = "cardedit"
+    const val HASHTAG_EDIT_ROUTE = "cardedit/hashtag"
 }

@@ -23,7 +23,7 @@
 
     <dimen name="profile_image">40dp</dimen>
     <dimen name="dialog_roundedCorner">10dp</dimen>
-
+    <dimen name="chip_roundedCorner">5dp</dimen>
     <dimen name="list_item_padding">8dp</dimen>
     <dimen name="header_height">192dp</dimen>
     <dimen name="header_padding">16dp</dimen>

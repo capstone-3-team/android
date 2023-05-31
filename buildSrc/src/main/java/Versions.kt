@@ -7,6 +7,7 @@ object Versions {
     /* Androidx */
     const val CORE_KTX = "1.9.0"
     const val MATERIAL = "1.3.1"
+    const val MATERIAL3 = "1.0.1"
     const val COMPOSE_UI = "1.3.3"
     const val COMPOSE_NAVIGATION = "2.5.3"
 
@@ -40,4 +41,9 @@ object Versions {
     /* Proto DataStore*/
     const val PROTOBUF_PLUGIN = "0.8.17"
     const val PROTOBUF = "3.14.0"
+
+    /* Personal Library*/
+    const val RICHTEXT = "0.16.0"                        // markdown
+    const val CHIP_TEXTFIELD = "0.4.6"
+
 }

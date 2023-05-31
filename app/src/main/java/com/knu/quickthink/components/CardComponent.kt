@@ -28,11 +28,12 @@ import com.knu.quickthink.model.Card
 
 
 @Composable
-fun CardContent(
+fun CardFeedContent(
 //    loading: Boolean,
     cards: List<Card>,
     @StringRes currentFilteringLabel: Int,
     onCardClick: (Card) -> Unit,
+    onCardEditClick : (String) -> Unit,
     onTaskCheckedChange: (Card, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -54,6 +55,7 @@ fun CardContent(
                 CardItem(
                     card = card,
                     onCardClick = onCardClick,
+                    onCardEditClick = onCardEditClick,
                     onCheckedChange = { onTaskCheckedChange(card, it) }
                 )
             }
@@ -66,7 +68,8 @@ fun CardContent(
 fun CardItem(
     card: Card,
     onCheckedChange: (Boolean) -> Unit,
-    onCardClick: (Card) -> Unit
+    onCardClick: (Card) -> Unit,
+    onCardEditClick: (String) -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.Start,
@@ -96,7 +99,7 @@ fun CardItem(
                     .weight(0.7f)
             )
             IconButton(
-                onClick = {},
+                onClick = {onCardEditClick(card.id)},
                 modifier = Modifier.weight(0.1f)
             ) {
                 Icon(
@@ -163,7 +166,7 @@ fun CardItem(
 @Composable
 fun CardContentPreview() {
     Surface {
-        CardContent(
+        CardFeedContent(
             cards = listOf(
                 Card(
                     id = "-NTh2lX5KeEMvu3j8zxD",
@@ -216,6 +219,7 @@ fun CardContentPreview() {
             ),
             currentFilteringLabel = R.string.app_name,
             onCardClick = {},
+            onCardEditClick = {},
             onTaskCheckedChange = { _, _ -> }
         )
     }
@@ -246,7 +250,8 @@ fun CardItemPreview() {
                 )
             ),
             onCheckedChange = {},
-            onCardClick = {}
+            onCardClick = {},
+            onCardEditClick = {}
         )
     }
 
