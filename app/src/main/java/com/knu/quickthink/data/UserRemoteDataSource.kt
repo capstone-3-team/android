@@ -1,10 +1,10 @@
 package com.knu.quickthink.data
 
-import com.knu.quickthink.model.GoogleUserModel
-import com.knu.quickthink.model.IntroductionResponse
+import com.knu.quickthink.model.user.GoogleUserModel
+import com.knu.quickthink.model.user.IntroductionResponse
 import com.knu.quickthink.model.NetworkResult
-import com.knu.quickthink.model.TokenValidResponse
-import com.knu.quickthink.network.UserApiService
+import com.knu.quickthink.model.user.TokenValidResponse
+import com.knu.quickthink.network.apiService.UserApiService
 import timber.log.Timber
 import javax.inject.Inject
 

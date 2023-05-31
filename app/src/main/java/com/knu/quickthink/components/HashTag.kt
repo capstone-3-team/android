@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dokar.chiptextfield.*
 import com.knu.quickthink.R
-import com.knu.quickthink.model.Card
+import com.knu.quickthink.model.card.Card
 import com.knu.quickthink.screens.main.testCard3
 import timber.log.Timber
 

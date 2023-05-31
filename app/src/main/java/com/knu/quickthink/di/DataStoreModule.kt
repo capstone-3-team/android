@@ -8,15 +8,11 @@ import androidx.datastore.dataStore
 import com.google.protobuf.InvalidProtocolBufferException
 import com.knu.quickthink.UserToken
 import com.knu.quickthink.data.UserTokenDataStore
-import com.knu.quickthink.repository.UserRepository
-import com.knu.quickthink.repository.UserRepositoryImpl
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.serialization.serializer
 import java.io.InputStream
 import java.io.OutputStream
 import javax.inject.Singleton

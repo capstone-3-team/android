@@ -6,7 +6,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import com.knu.quickthink.R
 import com.knu.quickthink.components.CardFeedContent
-import com.knu.quickthink.model.Card
+import com.knu.quickthink.model.card.Card
 
 @Composable
 fun FeedScreen(

@@ -1,4 +1,4 @@
-package com.knu.quickthink.repository
+package com.knu.quickthink.repository.user
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -8,6 +8,8 @@ import com.knu.quickthink.UserToken
 import com.knu.quickthink.data.UserRemoteDataSource
 import com.knu.quickthink.data.UserTokenDataStore
 import com.knu.quickthink.model.*
+import com.knu.quickthink.model.user.GoogleUserModel
+import com.knu.quickthink.model.user.IntroductionResponse
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber

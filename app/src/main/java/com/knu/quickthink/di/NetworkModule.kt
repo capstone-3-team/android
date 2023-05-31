@@ -1,8 +1,8 @@
 package com.knu.quickthink.di
 
-import com.knu.quickthink.network.UserApiService
-import com.knu.quickthink.repository.UserRepository
-import com.knu.quickthink.repository.UserRepositoryImpl
+import com.knu.quickthink.network.apiService.UserApiService
+import com.knu.quickthink.repository.user.UserRepository
+import com.knu.quickthink.repository.user.UserRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

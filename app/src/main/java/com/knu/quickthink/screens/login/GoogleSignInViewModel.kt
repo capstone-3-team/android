@@ -4,11 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.knu.quickthink.model.GoogleUserModel
 import com.knu.quickthink.model.onError
 import com.knu.quickthink.model.onException
-import com.knu.quickthink.model.onSuccess
-import com.knu.quickthink.repository.UserRepository
+import com.knu.quickthink.repository.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

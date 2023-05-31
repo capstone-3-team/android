@@ -1,9 +1,7 @@
 package com.knu.quickthink
 
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -11,7 +9,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
@@ -19,12 +16,12 @@ import timber.log.Timber
 @Composable
 fun rememberQuickThinkAppState(
     navController: NavHostController = rememberNavController(),
-    bottomSheetNavigator :BottomSheetNavigator = rememberBottomSheetNavigator(),
-    coroutineScope :CoroutineScope = rememberCoroutineScope(),
     sheetState : ModalBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
-//        confirmStateChange = { it != ModalBottomSheetValue.Hidden }
-    )
+        confirmValueChange = { it != ModalBottomSheetValue.Hidden }
+    ),
+    bottomSheetNavigator :BottomSheetNavigator = rememberBottomSheetNavigator(),
+    coroutineScope :CoroutineScope = rememberCoroutineScope(),
 ) = remember(navController,bottomSheetNavigator,coroutineScope,sheetState){
     QuickThinkAppState(navController,bottomSheetNavigator,coroutineScope,sheetState)
 }
@@ -54,4 +51,20 @@ class QuickThinkAppState(
     val currentRoute: String?
         @Composable get() = navController.currentBackStackEntryAsState().value?.destination?.route
 
+}
+
+@ExperimentalMaterialNavigationApi
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun rememberBottomSheetNavigator(
+    animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec
+): BottomSheetNavigator {
+    val sheetState = rememberModalBottomSheetState(
+        ModalBottomSheetValue.Hidden,
+        animationSpec,
+        confirmValueChange = { it != ModalBottomSheetValue.Hidden }
+    )
+    return remember(sheetState) {
+        BottomSheetNavigator(sheetState = sheetState)
+    }
 }

@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.flowlayout.FlowRow
 import com.knu.quickthink.R
-import com.knu.quickthink.model.Card
+import com.knu.quickthink.model.card.Card
 
 val testCard = Card(
     id = "-NTh2lX5KeEMvu3j8zxD",
