@@ -6,59 +6,66 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import timber.log.Timber
 import javax.inject.Inject
+
+
+data class CardEditUiState(
+    val title : String = "",
+    val content : TextFieldValue = TextFieldValue(""),
+    val isContentEditing : Boolean = false,
+    val isPreview : Boolean = false
+)
 
 @HiltViewModel
 class CardViewModel @Inject constructor(
 ): ViewModel(){
-    private val _title = MutableStateFlow("")
-    val title : StateFlow<String> = _title.asStateFlow()
 
-    private val _content = MutableStateFlow(TextFieldValue(text = ""))
-    val content : StateFlow<TextFieldValue> = _content.asStateFlow()
-
-    private val _isContentEditing = MutableStateFlow(false)
-    val isContentEditing : StateFlow<Boolean> = _isContentEditing.asStateFlow()
-
-    private val _isPreview = MutableStateFlow(false)
-    val isPreview : StateFlow<Boolean> = _isPreview.asStateFlow()
+    private val _uiState  = MutableStateFlow(CardEditUiState())
+    val uiState: StateFlow<CardEditUiState> = _uiState.asStateFlow()
 
     init {
         fetchContent()
     }
 
     fun editContent(newContent : TextFieldValue){
-        _content.value = newContent
+        _uiState.update { it.copy(content = newContent) }
     }
 
     fun editTitle (newTitle : String){
-        _title.value = newTitle
+        _uiState.update { it.copy(title = newTitle) }
     }
 
     fun startEditing(){
         Timber.tag("cardEdit").d("startEdit")
-        _isContentEditing.value = true
+        _uiState.update { it.copy(isContentEditing = true) }
     }
 
     fun  finishEditing(){
-        _isContentEditing.value = false
+        _uiState.update { it.copy(isContentEditing = false) }
     }
 
     fun reverseIsPreview(){
-        _isPreview.value = !_isPreview.value
-        _isContentEditing.value = !_isPreview.value
+        _uiState.update { it.copy(
+            isPreview = !it.isPreview,
+            isContentEditing = !it.isContentEditing)
+        }
     }
 
 
     fun updateContent(){
-
-        _isContentEditing.value = false
+        _uiState.update { it.copy(isContentEditing = false) }
     }
 
     fun fetchContent(){
-        _title.value = "제목"
-        _content.value = _content.value.copy(text = testMarkdown)
+        _uiState.update { state ->
+            state.copy(
+                title =  "제목",
+                content = state.content.copy(text = testMarkdown)
+            )
+
+        }
     }
     /* TODO : fetchContent  -> 처음 카드 내용 가져오기*/
 
