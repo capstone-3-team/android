@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import com.knu.quickthink.R
-import com.knu.quickthink.components.CardContent
+import com.knu.quickthink.components.CardFeedContent
 import com.knu.quickthink.model.Card
 
 @Composable
@@ -17,7 +17,7 @@ fun FeedScreen(
     if (window != null) {
         WindowCompat.setDecorFitsSystemWindows(window, true)        // CardEdit 갔다가 돌아왔을 때 부드럽게 연결하기 위해 DisposableEffect대신 사용
     }
-    CardContent(
+    CardFeedContent(
         cards = testCards,
         currentFilteringLabel = R.string.app_name,
         onCardClick = onCardClick,

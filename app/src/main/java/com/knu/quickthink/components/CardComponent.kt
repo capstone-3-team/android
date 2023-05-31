@@ -28,7 +28,7 @@ import com.knu.quickthink.model.Card
 
 
 @Composable
-fun CardContent(
+fun CardFeedContent(
 //    loading: Boolean,
     cards: List<Card>,
     @StringRes currentFilteringLabel: Int,
@@ -166,7 +166,7 @@ fun CardItem(
 @Composable
 fun CardContentPreview() {
     Surface {
-        CardContent(
+        CardFeedContent(
             cards = listOf(
                 Card(
                     id = "-NTh2lX5KeEMvu3j8zxD",
