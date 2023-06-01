@@ -29,6 +29,8 @@ import com.knu.quickthink.screens.card.CardReviewViewModel
 fun CardReviewScreen(
     cardId : Long,
     viewModel: CardReviewViewModel = hiltViewModel(),
+    onEditBtnClicked : (Long) -> Unit,
+    onCloseBtnClicked : () -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
@@ -55,7 +57,7 @@ fun CardReviewScreen(
             ) {
                 Spacer(modifier = Modifier.weight(0.7f))
                 IconButton(
-                    onClick = {},
+                    onClick = {onEditBtnClicked(cardId)},
                     modifier = Modifier.weight(0.1f)
                 ) {
                     Icon(
@@ -69,16 +71,16 @@ fun CardReviewScreen(
                 ){
                     Icon(
                         imageVector = Icons.Filled.Delete,
-                        contentDescription = "complete",
+                        contentDescription = "delete",
                     )
                 }
                 IconButton(
-                    onClick = {},
+                    onClick = onCloseBtnClicked,
                     modifier = Modifier.weight(0.1f)
                 ){
                     Icon(
                         imageVector = Icons.Filled.Close,
-                        contentDescription = "complete",
+                        contentDescription = "close",
                     )
                 }
             }

@@ -169,7 +169,12 @@ fun QuickThinkApp(
                                 .padding(10.dp)
                                 .clip(RoundedCornerShape(20.dp))
                             ) {
-                                CardReviewScreen(cardId)
+                                CardReviewScreen( cardId,
+                                    onEditBtnClicked = {
+                                        appState.navController.navigate("${MainDestination.CARD_EDIT_ROUTE}/$cardId")
+                                    },
+                                    onCloseBtnClicked = {appState.navController.popBackStack()}
+                                )
                             }
                         }
                         composable(

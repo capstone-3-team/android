@@ -113,7 +113,7 @@ fun CardEditScreen(
                     onChipDeleteClicked = { _, _ -> }
                 )
                 CardContent(
-                    modifier = Modifier.imePadding(),
+                    modifier = Modifier,
                     uiState = uiState,
                     focusRequester = focusRequester,
     //                    contentImePadding = contentImePadding,
@@ -150,10 +150,12 @@ fun CardContent(
         textAlign = TextAlign.Start
     )
     Column(modifier = modifier
+        .fillMaxSize()
+        .imePadding()
         .padding(vertical = dimensionResource(id = R.dimen.vertical_margin))
     ) {
         Crossfade(
-            modifier = modifier.weight(0.95f),
+            modifier = modifier.weight(0.93f),
     //            .padding(bottom = contentImePadding)
             targetState = uiState.isPreview
         ) { targetState ->
@@ -239,7 +241,8 @@ fun CardContent(
         CardStatusRow(
             modifier = modifier
                 .fillMaxWidth()
-                .weight(0.05f),
+                .weight(0.07f)
+            ,
             reviewCount = uiState.myCard.reviewCount,
             writtenDate = uiState.myCard.writtenDate,
             latestReviewDate = uiState.myCard.latestReviewDate
