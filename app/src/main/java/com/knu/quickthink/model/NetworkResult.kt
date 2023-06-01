@@ -15,6 +15,16 @@ suspend fun <T : Any> NetworkResult<T>.onSuccess(
     }
 }
 
+suspend fun <T : Any> NetworkResult<T>.onErrorOrException(
+    executable: suspend (code: Int, message: String?) -> Unit
+): NetworkResult<T> = apply {
+    if (this is NetworkResult.Error<T>) {
+        executable(code, message)
+    }else if (this is NetworkResult.Exception<T>) {
+        executable(999, e.message)
+    }
+}
+
 suspend fun <T : Any> NetworkResult<T>.onError(
     executable: suspend (code: Int, message: String?) -> Unit
 ): NetworkResult<T> = apply {

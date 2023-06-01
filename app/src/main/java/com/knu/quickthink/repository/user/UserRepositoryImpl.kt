@@ -1,5 +1,7 @@
-package com.knu.quickthink.repository
+package com.knu.quickthink.repository.user
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.common.api.ApiException
@@ -8,6 +10,13 @@ import com.knu.quickthink.UserToken
 import com.knu.quickthink.data.UserRemoteDataSource
 import com.knu.quickthink.data.UserTokenDataStore
 import com.knu.quickthink.model.*
+import com.knu.quickthink.model.user.GoogleUserModel
+import com.knu.quickthink.model.user.IntroductionResponse
+import com.knu.quickthink.network.RetrofitFailureStateException
+import com.knu.quickthink.network.UserManager
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
@@ -16,12 +25,18 @@ import javax.inject.Inject
 const val DEFAULT_PROFILE_IMAGE =
     "https://img.freepik.com/premium-vector/account-icon-user-icon-vector-graphics_292645-552.jpg?w=996"
 
+data class User(
+    val token :String = "",
+    val googleId :String = ""
+)
+
 class UserRepositoryImpl @Inject constructor(
     private val remoteDataSource: UserRemoteDataSource,
     private val googleSignInClient: GoogleSignInClient,
-    private val userTokenDataStore: UserTokenDataStore
+    private val userTokenDataStore: UserTokenDataStore,
+    private val userManager: UserManager
 ) : UserRepository {
-    override suspend fun login(gsa: GoogleSignInAccount): NetworkResult<String> {
+    override suspend fun login(gsa: GoogleSignInAccount): Result<String> {
 
         if (gsa.serverAuthCode == null || gsa.displayName == null || gsa.id == null) {
             throw NullPointerException("GoogleSignInAccount Data null")
@@ -32,9 +47,30 @@ class UserRepositoryImpl @Inject constructor(
             googleName = gsa.displayName!!,
             profilePicture = gsa.photoUrl?.toString() ?: DEFAULT_PROFILE_IMAGE
         )
-
         userTokenDataStore.setUserToken(gsa.serverAuthCode!!, gsa.id!!)
-        return remoteDataSource.login(googleUserModel)
+        return when(val networkResult = remoteDataSource.login(googleUserModel)){
+            is NetworkResult.Success -> {
+                userManager.login(userToken = gsa.serverAuthCode!!,gsa.id!!)
+                Result.success("success")
+            }
+            is NetworkResult.Error -> {
+                if(networkResult.code == 200) {
+                    userManager.login(userToken = gsa.serverAuthCode!!,gsa.id!!)
+                    Result.success("success")
+                }
+                else{
+                    Result.failure(
+                        RetrofitFailureStateException(networkResult.message,networkResult.code)
+                    )
+                }
+            }
+            is NetworkResult.Exception ->{
+                Result.failure(
+                    RetrofitFailureStateException(networkResult.e.message,999)
+                )
+            }
+
+        }
     }
 
     override suspend fun fetchIntroduction(): NetworkResult<IntroductionResponse> {
@@ -64,6 +100,7 @@ class UserRepositoryImpl @Inject constructor(
                 val refreshedToken = refreshToken()
                 if (refreshedToken.isNotEmpty() && updateRefreshToken(refreshedToken,userToken.googleId)) {
                     userTokenDataStore.setUserToken(refreshedToken, userToken.googleId)
+                    userManager.login(userToken = refreshedToken, googleId = userToken.googleId)
                     isLoggedIn = true
                     Timber.tag("googleLogin").d("refreshedToken is valid")
                 } else {
@@ -73,6 +110,7 @@ class UserRepositoryImpl @Inject constructor(
                 }
             } else {
                 Timber.tag("datastore").d("token valid")
+                userManager.login(userToken = userToken.token, googleId = userToken.googleId)
                 isLoggedIn = true
             }
         }
@@ -92,6 +130,7 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Timber.tag("googleLogin").e("logOut Error Exception : ${e.message}")
         }
+        if(isLoggedOut) userManager.logout()
         return isLoggedOut
     }
 

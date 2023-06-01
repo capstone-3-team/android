@@ -19,19 +19,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dokar.chiptextfield.*
 import com.knu.quickthink.R
-import com.knu.quickthink.model.Card
-import com.knu.quickthink.screens.main.testCard3
+import com.knu.quickthink.model.card.Card
+import com.knu.quickthink.model.card.HashTags
+import com.knu.quickthink.model.card.dummyHashTags
+import com.knu.quickthink.model.card.mycard.dummyMyCard
 import timber.log.Timber
 
 @Composable
 fun HashTagTextField(
-    card : Card,
+    hashTags: HashSet<String>,
     modifier: Modifier = Modifier,
-    readOnly : Boolean = true,
+    enabled : Boolean = true,
+    readOnly : Boolean = false,
+    onChipUpdated : (List<String>) -> Unit,
     onChipClicked: (String, Boolean) -> Unit,
     onChipDeleteClicked: (String, Boolean) -> Unit
 ) {
-    val state = rememberChipTextFieldState(chips = card.hashTags.map { HashTagChip(it)}.toList())
+    val state = rememberChipTextFieldState(chips = hashTags.map { HashTagChip(it)}.toList())
     val interactionSource = remember {
         MutableInteractionSource()
     }
@@ -49,16 +53,34 @@ fun HashTagTextField(
 
     HashTagChipTextField(
         state = state,
-        onSubmit = ::HashTagChip,
+        onSubmit = {
+            // 새로운 해시태그 추가됐을 경우 업데이트
+            Timber.d("onSubmit $it")
+            val chips = state.chips.map { chip -> chip.text }
+            onChipUpdated(chips + it)                                                                 // 실제 chips의 값이 업데이트 되는건 나중이므로 여기서 바로 +it을 통해서 viewmodel의 값 업데이트한다
+            HashTagChip(it)
+        },
+        onChipEditDone = {
+            // 기존 해시태그 수정됐을 경우 업데이트
+            val chips = state.chips.map { it.text }
+            onChipUpdated(chips)
+            Timber.d("onChipEditDone chips : $chips")
+        },
         modifier = modifier,
+        enabled = enabled,
         readOnly = readOnly,
+        placeholder = {
+            Text(text = "해시태그를 입력해 주세요")
+        },
         chipStyle = ChipTextFieldDefaults.chipStyle(
             unfocusedBackgroundColor = colorResource(id = R.color.quickThink_blue),
         ),
         colors = TextFieldDefaults.textFieldColors(
             backgroundColor = Color.White
         ),
-        onChipClick = { chip -> onChipClicked(chip.text,false) },
+        onChipClick = { chip ->
+            Timber.d("onChipClicked : $onChipClicked  chip: $chip")
+            onChipClicked(chip.text,false) },
         chipTrailingIcon = {
             Image(
                 imageVector = Icons.Default.Clear,
@@ -66,7 +88,11 @@ fun HashTagTextField(
                 alignment = Alignment.Center,
                 modifier = Modifier
                     .size(18.dp)
-                    .clickable { onChipDeleteClicked("", false) },
+                    .clickable {
+                        state.removeChip(it)
+                        val chips = state.chips.map { it.text }
+                        onChipUpdated(chips)
+                    },
                 colorFilter = ColorFilter.tint(Color.White)
             )
         },
@@ -85,7 +111,8 @@ fun HashTagTextFieldPrev(){
     Column() {
         Spacer(modifier = Modifier.weight(0.8f))
         HashTagTextField(
-            card = testCard3,
+            hashTags = dummyHashTags.hashTags.toHashSet(),
+            onChipUpdated = {_ -> },
             onChipClicked ={_,_ ->} ,
             onChipDeleteClicked = { _, _ ->}
         )

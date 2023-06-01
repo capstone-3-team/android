@@ -1,4 +1,4 @@
-package com.knu.quickthink.screens.main
+package com.knu.quickthink.screens.account
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures

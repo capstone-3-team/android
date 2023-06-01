@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import com.dokar.chiptextfield.ChipStyle
 import com.dokar.chiptextfield.ChipTextFieldDefaults
 import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
+import com.knu.quickthink.R
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -59,6 +61,7 @@ import timber.log.Timber
 fun <T : HashTagChip> HashTagChipTextField(
     state: ChipTextFieldState<T>,
     onSubmit: (value: String) -> T?,
+    onChipEditDone: () -> Unit,
     modifier: Modifier = Modifier,
     innerModifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -99,12 +102,14 @@ fun <T : HashTagChip> HashTagChipTextField(
         modifier = modifier
             .background(colors.backgroundColor(enabled).value, shape)
             .indicatorLine(enabled, isError, interactionSource, colors)
+            .padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin))
     ) {
         HashTagChipTextField(
             state = state,
             onSubmit = onSubmit,
             value = value,
             onValueChange = onValueChange,
+            onChipEditDone = onChipEditDone,
             modifier = innerModifier.fillMaxWidth(),
             enabled = enabled,
             readOnly = readOnly,
@@ -150,6 +155,7 @@ fun <T : HashTagChip> HashTagChipTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     onSubmit: (value: String) -> T?,
+    onChipEditDone: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     readOnly: Boolean = false,
@@ -174,8 +180,9 @@ fun <T : HashTagChip> HashTagChipTextField(
 
     val textFieldFocusRequester = remember { FocusRequester() }
 
+    Timber.d("readOnly : $readOnly")
     val editable = enabled && !readOnly
-
+    Timber.d("editable : $editable")
     val keyboardController = LocalSoftwareKeyboardController.current
 
 //    val bringLastIntoViewRequester = remember { StableHolder(BringIntoViewRequester()) }
@@ -210,15 +217,21 @@ fun <T : HashTagChip> HashTagChipTextField(
             state.disposed = true
         }
     }
-
+    val editableState = remember{ mutableStateOf(editable)}
+    LaunchedEffect(editable){
+        editableState.value = editable
+    }
     decorationBox {
         com.google.accompanist.flowlayout.FlowRow(
             modifier = modifier
                 .pointerInput(value) {
                     detectTapGestures(
                         onTap = {
-                            if (!editable) return@detectTapGestures
-                            Timber.tag("chipFocus").d("FlowRow detectTapGestures")
+                            Timber.tag("chipFocus").d("editable : ${editableState.value}")                                   //밖에 editable은 false인데 왜 여기서는 true로 나오지? 상태 변화가 안 일어나나본데
+                            if (!editableState.value ) return@detectTapGestures
+                            Timber
+                                .tag("chipFocus")
+                                .d("FlowRow detectTapGestures")
                             keyboardController?.show()
                             textFieldFocusRequester.requestFocus()
                             state.focusedChip = null
@@ -238,6 +251,7 @@ fun <T : HashTagChip> HashTagChipTextField(
                 state = state,
                 enabled = enabled,
                 readOnly = readOnly || readOnlyChips,
+                onChipEditDone = onChipEditDone,
                 onRemoveRequest = { state.removeChip(it) },
                 onFocused = {
                     Timber.tag("chipFocus").d("Chips onFocused의 it:$it")
@@ -308,6 +322,7 @@ fun <T : HashTagChip> Chips(
     state: ChipTextFieldState<T>,
     enabled: Boolean,
     readOnly: Boolean,
+    onChipEditDone : () -> Unit,
     onRemoveRequest: (T) -> Unit,
     onFocused: (FocusInteraction.Focus) -> Unit,
     onFreeFocus: (FocusInteraction.Focus) -> Unit,
@@ -378,6 +393,7 @@ fun <T : HashTagChip> Chips(
             chip = chip,
             enabled = enabled,
             readOnly = readOnly,
+            onChipEditDone = onChipEditDone,
             onRemoveRequest = {
                 // Call before removing chip
                 onFreeFocus(chip.focus)
@@ -548,6 +564,7 @@ private fun <T : HashTagChip> ChipItem(
     chip: T,
     enabled: Boolean,
     readOnly: Boolean,
+    onChipEditDone : () -> Unit,
     onRemoveRequest: () -> Unit,
     onFocusNextRequest: () -> Unit,
     onFocusChange: (isFocused: Boolean) -> Unit,
@@ -624,7 +641,9 @@ private fun <T : HashTagChip> ChipItem(
                 enabled = enabled,
                 onClick = {
                     if (editable) {
-                        Timber.tag("chipFocus").d("ChipItemLayout.onClick()")
+                        Timber
+                            .tag("chipFocus")
+                            .d("ChipItemLayout.onClick()")
 //                        keyboardController?.show()                                                                            // 딱히 필요없음. BasicTextField가 있잖아
 //                        focusRequester.requestFocus()                                                                         //둘다 상관없는데
                     }
@@ -650,7 +669,9 @@ private fun <T : HashTagChip> ChipItem(
                 .padding(horizontal = 8.dp, vertical = 3.dp)
                 .focusRequester(focusRequester)
                 .onFocusChanged {
-                    Timber.tag("chipFocus").d("ChipItem BasicTextField.onFocusChanged()")
+                    Timber
+                        .tag("chipFocus")
+                        .d("ChipItem BasicTextField.onFocusChanged()")
                     onFocusChange(it.isFocused)
                 }
                 .onPreviewKeyEvent {
@@ -667,7 +688,11 @@ private fun <T : HashTagChip> ChipItem(
                     false
                 },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { onFocusNextRequest() }),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    onChipEditDone()
+                    onFocusNextRequest()
+                }),
             singleLine = false,
             enabled = !readOnly && enabled,
             readOnly = readOnly || !enabled,

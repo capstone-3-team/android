@@ -4,11 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.knu.quickthink.model.GoogleUserModel
 import com.knu.quickthink.model.onError
 import com.knu.quickthink.model.onException
-import com.knu.quickthink.model.onSuccess
-import com.knu.quickthink.repository.UserRepository
+import com.knu.quickthink.network.RetrofitFailureStateException
+import com.knu.quickthink.repository.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,17 +40,12 @@ class GoogleSignInViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             userRepository.login(gsa)
-                .onError { code, message ->
-                    if(code == 200){
-                       Timber.tag("googleLogin").d("onError code : $code -> success")
-                        delay(DELAY_TIME)
-                        _isLogInSuccess.value = true
-                    }else{
-                       Timber.tag("googleLogin").d("onError code : $code, message : $message")
-
-                    }
-                }.onException { e ->
-                    Timber.tag("googleLogin").d("onException message : ${e.message}")
+                .onSuccess {
+                    delay(DELAY_TIME)
+                    _isLogInSuccess.value = true
+                }.onFailure {
+                    it as RetrofitFailureStateException
+                    Timber.tag("googleLogin").d("onFailure code : ${it.code} message : ${it.message}")
                 }
         }
     }

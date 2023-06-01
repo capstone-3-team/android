@@ -4,15 +4,15 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -23,10 +23,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImagePainter
@@ -34,6 +32,8 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.knu.quickthink.R
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import com.airbnb.lottie.compose.*
 
 
@@ -106,7 +106,9 @@ fun QuickThinkTopAppBar(
             initialOffsetY = {fullHeight ->  -fullHeight},
             animationSpec = tween(durationMillis = 400, easing = LinearOutSlowInEasing)
         ),
-        modifier = Modifier.fillMaxWidth().animateContentSize()
+        modifier = Modifier
+            .fillMaxWidth()
+            .animateContentSize()
     )
     {
         TopAppBar(
@@ -229,6 +231,100 @@ fun LottieImage(rawRes : Int, modifier: Modifier) {
     )
 }
 
+@Composable
+fun CenterCircularProgressIndicator() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(4.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun FABContent(onTap: () -> Unit) {
+    FloatingActionButton(
+        onClick = onTap,
+        shape = RoundedCornerShape(50.dp),
+        backgroundColor  = colorResource(id = R.color.quickThink_blue)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = "Add Card",
+            tint = Color.White
+        )
+    }
+}
+@Composable
+fun CardDeleteConfirmDialog(
+    onDeleteBtnClicked: () -> Unit,
+    onCloseBtnClicked: () -> Unit
+){
+    DeleteConfirmDialog(
+        title = "카드 삭제",
+        text = "정말 카드를 삭제하시겠습니까?",
+        onDeleteBtnClicked = onDeleteBtnClicked,
+        onCloseBtnClicked = onCloseBtnClicked
+    )
+}
+
+@Composable
+fun DeleteConfirmDialog(
+    title : String,
+    text : String,
+    onDeleteBtnClicked: () -> Unit,
+    onCloseBtnClicked: () -> Unit
+) {
+    val buttonColors = ButtonDefaults.buttonColors(
+        backgroundColor = Color.Transparent,
+        contentColor = colorResource(id = R.color.quickThink_blue)
+    )
+    AlertDialog(
+        onDismissRequest = onCloseBtnClicked,
+        title = { Text(text = title,textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) },
+        text = { Text(text = text, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) },
+        buttons = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+//                    .width(350.dp)
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                TextButton(
+                    onClick = onCloseBtnClicked,
+                    colors = buttonColors
+                ) {
+                    Text("취소")
+                }
+                TextButton(
+                    onClick = {
+                        onDeleteBtnClicked()
+                        onCloseBtnClicked()
+                    },
+                    colors = buttonColors
+                ) {
+                    Text("확인")
+                }
+            }
+        },
+        shape = RoundedCornerShape(24.dp)
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CardDeleteConfrimDialogPrev() {
+    Surface() {
+        CardDeleteConfirmDialog(onDeleteBtnClicked = { /*TODO*/ }) {
+
+        }
+
+    }
+
+}
 
 //@Preview(showBackground = true)
 //@Composable

@@ -1,14 +1,12 @@
-package com.knu.quickthink.repository
+package com.knu.quickthink.repository.user
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.knu.quickthink.UserToken
-import com.knu.quickthink.model.GoogleUserModel
-import com.knu.quickthink.model.IntroductionResponse
+import com.knu.quickthink.model.user.IntroductionResponse
 import com.knu.quickthink.model.NetworkResult
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
-    suspend fun login(gsa :GoogleSignInAccount): NetworkResult<String>
+    suspend fun login(gsa :GoogleSignInAccount): Result<String>
     suspend fun autoLogin() : Boolean
 
     suspend fun logOut() : Boolean

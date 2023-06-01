@@ -14,7 +14,11 @@ fun <T : Any> handleApi(
         if (response.isSuccessful && body != null) {
             Timber.tag("network").d("handleApi : response.isSuccessful && body not null")
             NetworkResult.Success(body)
-        } else {
+        }else if(response.code() == 200){
+            @Suppress("UNCHECKED_CAST")
+                NetworkResult.Success("success" as T)
+        }
+        else{
             Timber.tag("network").d("handleApi : response not Successful or body is null ")
             NetworkResult.Error(code = response.code(), message = response.message())
         }
@@ -26,3 +30,4 @@ fun <T : Any> handleApi(
         NetworkResult.Exception(e)
     }
 }
+

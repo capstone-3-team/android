@@ -1,9 +1,9 @@
-package com.knu.quickthink.network
+package com.knu.quickthink.network.apiService
 
-import com.knu.quickthink.model.GoogleUserModel
-import com.knu.quickthink.model.IntroductionResponse
+import com.knu.quickthink.model.user.GoogleUserModel
+import com.knu.quickthink.model.user.IntroductionResponse
 import com.knu.quickthink.model.NetworkResult
-import com.knu.quickthink.model.TokenValidResponse
+import com.knu.quickthink.model.user.TokenValidResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header

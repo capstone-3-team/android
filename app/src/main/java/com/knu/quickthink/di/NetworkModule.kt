@@ -1,8 +1,12 @@
 package com.knu.quickthink.di
 
-import com.knu.quickthink.network.UserApiService
-import com.knu.quickthink.repository.UserRepository
-import com.knu.quickthink.repository.UserRepositoryImpl
+import com.knu.quickthink.network.apiService.MyCardApiService
+import com.knu.quickthink.network.apiService.OthersCardApiService
+import com.knu.quickthink.network.apiService.UserApiService
+import com.knu.quickthink.repository.card.CardRepository
+import com.knu.quickthink.repository.card.CardRepositoryImpl
+import com.knu.quickthink.repository.user.UserRepository
+import com.knu.quickthink.repository.user.UserRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -19,6 +23,19 @@ object NetworkModule {
     fun provideUserApiService(retrofit: Retrofit): UserApiService {
         return retrofit.create(UserApiService::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideMyCardApiService(retrofit: Retrofit): MyCardApiService {
+        return retrofit.create(MyCardApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOthersCardApiService(retrofit: Retrofit): OthersCardApiService {
+        return retrofit.create(OthersCardApiService::class.java)
+    }
+
 }
 
 @Module
@@ -30,4 +47,11 @@ abstract class RepositoryModule {
     abstract fun bindAuthRepository(
         UserRepositoryImpl: UserRepositoryImpl
     ): UserRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindCardRepository(
+        CardRepositoryImpl: CardRepositoryImpl
+    ): CardRepository
+
 }
