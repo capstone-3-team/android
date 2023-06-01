@@ -1,18 +1,21 @@
 package com.knu.quickthink.repository.card
 
+import androidx.compose.runtime.collectAsState
 import com.knu.quickthink.data.CardRemoteDataSource
+import com.knu.quickthink.data.UserTokenDataStore
 import com.knu.quickthink.model.NetworkResult
-import com.knu.quickthink.model.card.CreateCardRequest
-import com.knu.quickthink.model.card.HashTags
-import com.knu.quickthink.model.card.UpdateCardRequest
+import com.knu.quickthink.model.card.*
 import com.knu.quickthink.model.card.mycard.MyCard
-import com.knu.quickthink.model.card.mycard.MyCards
 import com.knu.quickthink.model.card.otherscard.OthersCard
-import com.knu.quickthink.model.card.otherscard.OthersCards
+import com.knu.quickthink.network.UserManager
+import com.knu.quickthink.repository.user.UserRepository
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class CardRepositoryImpl @Inject constructor(
-    private val remoteDataSource: CardRemoteDataSource
+    private val remoteDataSource: CardRemoteDataSource,
+    private val userManager: UserManager
 ) : CardRepository{
 
     override suspend fun createCard(createCardRequest: CreateCardRequest): NetworkResult<String> {
@@ -23,8 +26,9 @@ class CardRepositoryImpl @Inject constructor(
         return remoteDataSource.fetchMyCard(cardId)
     }
 
-    override suspend fun fetchMyCards(hashTags: HashTags): NetworkResult<MyCards> {
-        return  remoteDataSource.fetchMyCards(hashTags)
+    override suspend fun fetchMyCards(hashTags: HashTags): NetworkResult<Cards<MyCard>> {
+        val user = userManager.userState.first()
+        return  remoteDataSource.fetchMyCards(user.googleId,hashTags)
     }
 
     override suspend fun updateCard(
@@ -46,7 +50,7 @@ class CardRepositoryImpl @Inject constructor(
         return remoteDataSource.fetchOthersCard(cardId)
     }
 
-    override suspend fun fetchOthersCards(hashTags: HashTags): NetworkResult<OthersCards> {
+    override suspend fun fetchOthersCards(hashTags: HashTags): NetworkResult<Cards<OthersCard>> {
         return remoteDataSource.fetchOthersCards(hashTags)
     }
 }

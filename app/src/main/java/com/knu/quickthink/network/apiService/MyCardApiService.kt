@@ -1,9 +1,10 @@
 package com.knu.quickthink.network.apiService
 
 import com.knu.quickthink.model.NetworkResult
+import com.knu.quickthink.model.card.Cards
 import com.knu.quickthink.model.card.CreateCardRequest
+import com.knu.quickthink.model.card.HashTags
 import com.knu.quickthink.model.card.UpdateCardRequest
-import com.knu.quickthink.model.card.mycard.MyCards
 import com.knu.quickthink.model.card.mycard.MyCard
 import retrofit2.http.*
 
@@ -21,8 +22,9 @@ interface MyCardApiService {
 
     @POST("/api/card")
     suspend fun fetchMyCards(
-        @Body hashTags :List<String>
-    ) : NetworkResult<MyCards>
+        @Query("googleId") googleId : String,
+        @Body hashTags : HashTags
+    ) : NetworkResult<Cards<MyCard>>
 
     @PUT("api/card/edit")
     suspend fun updateCard(
