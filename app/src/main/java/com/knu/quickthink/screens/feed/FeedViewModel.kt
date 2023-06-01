@@ -46,7 +46,7 @@ class FeedViewModel @Inject constructor(
             cardRepository.fetchMyCards(_uiState.value.hashTags)
                 .onSuccess {
                     _uiState.update { state ->
-                        state.copy(cards = convertMyCardsDate(it), isLoading = false)
+                        state.copy(cards = it, isLoading = false)
                     }
                 }.onErrorOrException{ code, message ->
                     Timber.d("code : $code  message : $message")

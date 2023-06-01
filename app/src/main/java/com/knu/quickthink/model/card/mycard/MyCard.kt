@@ -21,8 +21,8 @@ val emptyMyCard = MyCard(
     isYours = true,
     content = "내용을 입력해주세요",
     hashTags = emptyList<String>().toHashSet(),
-    writtenDate = convertDateFormat(LocalDateTime.now().toString()),
-    latestReviewDate = convertDateFormat(LocalDateTime.now().toString()),
+    writtenDate = LocalDateTime.now().toString(),
+    latestReviewDate = LocalDateTime.now().toString(),
     reviewCount = 0
 )
 

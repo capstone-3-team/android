@@ -6,5 +6,5 @@ data class UpdateCardRequest(
     val title : String,
     val content : String,
     val hashTags: HashTags,
-    val writtenDate : LocalDateTime
+    val writtenDate : String
 )
