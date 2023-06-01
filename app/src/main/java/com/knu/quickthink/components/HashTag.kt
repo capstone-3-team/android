@@ -27,14 +27,15 @@ import timber.log.Timber
 
 @Composable
 fun HashTagTextField(
-    hashTags: HashTags,
+    hashTags: HashSet<String>,
     modifier: Modifier = Modifier,
     enabled : Boolean = true,
     readOnly : Boolean = false,
+    onChipUpdated : (List<String>) -> Unit,
     onChipClicked: (String, Boolean) -> Unit,
     onChipDeleteClicked: (String, Boolean) -> Unit
 ) {
-    val state = rememberChipTextFieldState(chips = hashTags.hashTags.map { HashTagChip(it)}.toList())
+    val state = rememberChipTextFieldState(chips = hashTags.map { HashTagChip(it)}.toList())
     val interactionSource = remember {
         MutableInteractionSource()
     }
@@ -52,7 +53,19 @@ fun HashTagTextField(
 
     HashTagChipTextField(
         state = state,
-        onSubmit = ::HashTagChip,
+        onSubmit = {
+            // 새로운 해시태그 추가됐을 경우 업데이트
+            Timber.d("onSubmit $it")
+            val chips = state.chips.map { chip -> chip.text }
+            onChipUpdated(chips + it)                                                                 // 실제 chips의 값이 업데이트 되는건 나중이므로 여기서 바로 +it을 통해서 viewmodel의 값 업데이트한다
+            HashTagChip(it)
+        },
+        onChipEditDone = {
+            // 기존 해시태그 수정됐을 경우 업데이트
+            val chips = state.chips.map { it.text }
+            onChipUpdated(chips)
+            Timber.d("onChipEditDone chips : $chips")
+        },
         modifier = modifier,
         enabled = enabled,
         readOnly = readOnly,
@@ -65,7 +78,9 @@ fun HashTagTextField(
         colors = TextFieldDefaults.textFieldColors(
             backgroundColor = Color.White
         ),
-        onChipClick = { chip -> onChipClicked(chip.text,false) },
+        onChipClick = { chip ->
+            Timber.d("onChipClicked : $onChipClicked  chip: $chip")
+            onChipClicked(chip.text,false) },
         chipTrailingIcon = {
             Image(
                 imageVector = Icons.Default.Clear,
@@ -92,7 +107,8 @@ fun HashTagTextFieldPrev(){
     Column() {
         Spacer(modifier = Modifier.weight(0.8f))
         HashTagTextField(
-            hashTags = dummyHashTags,
+            hashTags = dummyHashTags.hashTags.toHashSet(),
+            onChipUpdated = {_ -> },
             onChipClicked ={_,_ ->} ,
             onChipDeleteClicked = { _, _ ->}
         )

@@ -3,10 +3,10 @@ package com.knu.quickthink.screens.card
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.knu.quickthink.model.card.HashTags
+import com.knu.quickthink.model.card.UpdateCardRequest
 import com.knu.quickthink.model.card.mycard.MyCard
-import com.knu.quickthink.model.card.mycard.dummyMyCard
 import com.knu.quickthink.model.card.mycard.emptyMyCard
-import com.knu.quickthink.model.converter.convertMyCardDate
 import com.knu.quickthink.model.onErrorOrException
 import com.knu.quickthink.model.onSuccess
 import com.knu.quickthink.repository.card.CardRepository
@@ -36,18 +36,6 @@ class CardEditViewModel @Inject constructor(
     private val _uiState  = MutableStateFlow(CardEditUiState())
     val uiState: StateFlow<CardEditUiState> = _uiState.asStateFlow()
 
-//    init {
-//        fetchContent()
-//    }
-
-    fun editContent(newContent : TextFieldValue){
-        _uiState.update { it.copy(content = newContent) }
-    }
-
-    fun editTitle (newTitle : String){
-        _uiState.update { it.copy(myCard = it.myCard.copy(title = newTitle)) }
-    }
-
     fun startEditing(){
         Timber.tag("cardEdit").d("startEdit")
         _uiState.update { it.copy(isContentEditing = true) }
@@ -65,25 +53,41 @@ class CardEditViewModel @Inject constructor(
         }
     }
 
-
-    fun updateContent(){
+    /**
+     * 키보드를 닫았을 때 카드 전체 내용을 서버에 업데이트 한다
+    * */
+    fun updateCard(){
+        viewModelScope.launch {
+            val card = uiState.value.myCard
+            cardRepository.updateCard(
+                cardId = uiState.value.myCard.id,
+                updateCardRequest = UpdateCardRequest(
+                    title = card.title,
+                    content = uiState.value.content.text,                       // content는 textFieldValue로 따로 관리하기 때문에 직접 가져와줘야함
+                    hashTags = HashTags(card.hashTags.toList()),
+                    writtenDate = card.writtenDate
+                )
+            )
+        }
         _uiState.update { it.copy(isContentEditing = false) }
     }
 
-    /* TODO : fetchContent  -> 처음 카드 내용 가져오기*/
+    /**
+     *  fetchContent  -> 처음 카드 내용 가져오기
+     *  */
     fun fetchMyCard(cardId : Long){
         if(cardId > -1){
             viewModelScope.launch {
-                uiStateUpdate(_uiState.value.copy(isLoading = true))
+                updateUiState(_uiState.value.copy(isLoading = true))
                 cardRepository.fetchMyCard(cardId)
                     .onSuccess {
-                        uiStateUpdate(uiState.value.copy(
-                            myCard = convertMyCardDate(it),
+                        updateUiState(uiState.value.copy(
+                            myCard = it,
                             content = uiState.value.content.copy(text = it.content),
                             isLoading = false
                         ))
                     }.onErrorOrException { code, message ->
-                        uiStateUpdate(uiState.value.copy(
+                        updateUiState(uiState.value.copy(
                             myCard = emptyMyCard,
                             content = uiState.value.content.copy(text ="카드를 불러오지 못했습니다"),
                             isLoading = false
@@ -93,11 +97,13 @@ class CardEditViewModel @Inject constructor(
         }
     }
 
-    private fun uiStateUpdate(newState : CardEditUiState){
+    fun updateUiState(newState : CardEditUiState){
         _uiState.update {newState}
     }
 
-    /* TODO: updateContent -> 카드 내용 저장*/
+    fun updateUiStateOfCard(card : MyCard){
+        _uiState.update { it.copy(myCard = card) }
+    }
 }
 val testMarkdown = """
     # Demo

@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -35,7 +34,7 @@ import com.halilibo.richtext.ui.RichText
 import com.knu.quickthink.R
 import com.knu.quickthink.components.CenterCircularProgressIndicator
 import com.knu.quickthink.components.HashTagTextField
-import com.knu.quickthink.model.card.dummyHashTags
+import com.knu.quickthink.utils.convertDateFormat
 import timber.log.Timber
 
 
@@ -60,7 +59,7 @@ fun CardEditScreen(
         Timber.tag("cardEdit").d("LaunchedEffect isKeyboardOpen $isKeyboardOpen")
         if (!isKeyboardOpen) {
             focusManager.clearFocus()
-            viewModel.updateContent()
+            viewModel.updateCard()
         }
     }
     LaunchedEffect(Unit){
@@ -70,6 +69,12 @@ fun CardEditScreen(
             WindowCompat.setDecorFitsSystemWindows(window, false)
         }
     }
+
+    LaunchedEffect(uiState.myCard, uiState.content){
+        Timber.d("myCard : ${uiState.myCard}")
+        Timber.d("content : ${uiState.content.text}")
+    }
+
     if(uiState.isLoading){
         CenterCircularProgressIndicator()
     }else{
@@ -102,13 +107,17 @@ fun CardEditScreen(
                     title = uiState.myCard.title,
                     isPreview = uiState.isPreview
                 ){
-                    viewModel.editTitle(it)
+                    viewModel.updateUiStateOfCard(uiState.myCard.copy(title = it))
                 }
                 HashTagTextField(
-                    hashTags = dummyHashTags,
+                    hashTags = uiState.myCard.hashTags,
                     modifier = Modifier.fillMaxWidth(),
 //                    enabled = uiState.isPreview,
                     readOnly = uiState.isPreview,
+                    onChipUpdated = {
+                        Timber.d("onChipUpdated : $it")
+                        viewModel.updateUiStateOfCard(uiState.myCard.copy(hashTags = it.toHashSet()))
+                    },
                     onChipClicked = { _, _ -> },
                     onChipDeleteClicked = { _, _ -> }
                 )
@@ -121,7 +130,10 @@ fun CardEditScreen(
                         if(focusState.isFocused || focusState.hasFocus) viewModel.startEditing()
                         else viewModel.finishEditing()
                     },
-                    onValueChange = { viewModel.editContent(it) },
+                    onValueChange = {
+                        viewModel.updateUiState(uiState.copy(content = it))
+//                        viewModel.updateUiStateOfCard(uiState.myCard.copy(content = it.text))
+                    },
                     onContentClicked = { viewModel.reverseIsPreview() }
                 )
             }
@@ -244,8 +256,8 @@ fun CardContent(
                 .weight(0.07f)
             ,
             reviewCount = uiState.myCard.reviewCount,
-            writtenDate = uiState.myCard.writtenDate,
-            latestReviewDate = uiState.myCard.latestReviewDate
+            writtenDate = convertDateFormat(uiState.myCard.writtenDate),
+            latestReviewDate = convertDateFormat(uiState.myCard.latestReviewDate)
         )
     }
 }

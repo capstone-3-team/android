@@ -61,6 +61,7 @@ import timber.log.Timber
 fun <T : HashTagChip> HashTagChipTextField(
     state: ChipTextFieldState<T>,
     onSubmit: (value: String) -> T?,
+    onChipEditDone: () -> Unit,
     modifier: Modifier = Modifier,
     innerModifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -108,6 +109,7 @@ fun <T : HashTagChip> HashTagChipTextField(
             onSubmit = onSubmit,
             value = value,
             onValueChange = onValueChange,
+            onChipEditDone = onChipEditDone,
             modifier = innerModifier.fillMaxWidth(),
             enabled = enabled,
             readOnly = readOnly,
@@ -153,6 +155,7 @@ fun <T : HashTagChip> HashTagChipTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     onSubmit: (value: String) -> T?,
+    onChipEditDone: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     readOnly: Boolean = false,
@@ -248,6 +251,7 @@ fun <T : HashTagChip> HashTagChipTextField(
                 state = state,
                 enabled = enabled,
                 readOnly = readOnly || readOnlyChips,
+                onChipEditDone = onChipEditDone,
                 onRemoveRequest = { state.removeChip(it) },
                 onFocused = {
                     Timber.tag("chipFocus").d("Chips onFocused의 it:$it")
@@ -318,6 +322,7 @@ fun <T : HashTagChip> Chips(
     state: ChipTextFieldState<T>,
     enabled: Boolean,
     readOnly: Boolean,
+    onChipEditDone : () -> Unit,
     onRemoveRequest: (T) -> Unit,
     onFocused: (FocusInteraction.Focus) -> Unit,
     onFreeFocus: (FocusInteraction.Focus) -> Unit,
@@ -388,6 +393,7 @@ fun <T : HashTagChip> Chips(
             chip = chip,
             enabled = enabled,
             readOnly = readOnly,
+            onChipEditDone = onChipEditDone,
             onRemoveRequest = {
                 // Call before removing chip
                 onFreeFocus(chip.focus)
@@ -558,6 +564,7 @@ private fun <T : HashTagChip> ChipItem(
     chip: T,
     enabled: Boolean,
     readOnly: Boolean,
+    onChipEditDone : () -> Unit,
     onRemoveRequest: () -> Unit,
     onFocusNextRequest: () -> Unit,
     onFocusChange: (isFocused: Boolean) -> Unit,
@@ -681,7 +688,11 @@ private fun <T : HashTagChip> ChipItem(
                     false
                 },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { onFocusNextRequest() }),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    onChipEditDone()
+                    onFocusNextRequest()
+                }),
             singleLine = false,
             enabled = !readOnly && enabled,
             readOnly = readOnly || !enabled,
