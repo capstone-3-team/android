@@ -11,8 +11,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -106,7 +108,9 @@ fun QuickThinkTopAppBar(
             initialOffsetY = {fullHeight ->  -fullHeight},
             animationSpec = tween(durationMillis = 400, easing = LinearOutSlowInEasing)
         ),
-        modifier = Modifier.fillMaxWidth().animateContentSize()
+        modifier = Modifier
+            .fillMaxWidth()
+            .animateContentSize()
     )
     {
         TopAppBar(
@@ -227,6 +231,34 @@ fun LottieImage(rawRes : Int, modifier: Modifier) {
         progress = { progress },
         modifier = modifier,
     )
+}
+
+@Composable
+fun CenterCircularProgressIndicator() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(4.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun FABContent(onTap: () -> Unit) {
+    FloatingActionButton(
+        onClick = onTap,
+        shape = RoundedCornerShape(50.dp),
+        backgroundColor  = colorResource(id = R.color.quickThink_blue)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = "Add Card",
+            tint = Color.White
+        )
+    }
 }
 
 
