@@ -40,7 +40,7 @@ class FeedViewModel @Inject constructor(
         fetchMyCards()
     }
 
-    private fun fetchMyCards(){
+    fun fetchMyCards(){
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             cardRepository.fetchMyCards(_uiState.value.hashTags)

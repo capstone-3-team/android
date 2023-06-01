@@ -173,7 +173,7 @@ fun QuickThinkApp(
                                     onEditBtnClicked = {
                                         appState.navController.navigate("${MainDestination.CARD_EDIT_ROUTE}/$cardId")
                                     },
-                                    onCloseBtnClicked = {appState.navController.popBackStack()}
+                                    onCloseBtnClicked = {appState.navController.navigate(MainDestination.FEED_ROUTE)}
                                 )
                             }
                         }

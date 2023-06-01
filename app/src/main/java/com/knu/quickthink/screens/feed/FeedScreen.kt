@@ -1,6 +1,7 @@
 package com.knu.quickthink.screens.main
 
 import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -9,6 +10,7 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.knu.quickthink.R
 import com.knu.quickthink.components.CardFeedContent
+import com.knu.quickthink.components.CenterCircularProgressIndicator
 import com.knu.quickthink.model.card.Card
 import com.knu.quickthink.screens.feed.FeedViewModel
 import timber.log.Timber
@@ -28,14 +30,17 @@ fun FeedScreen(
     }
 
     Timber.d("cards : ${uiState.cards}")
-
-    CardFeedContent(
-        cards = uiState.cards,
-        currentFilteringLabel = R.string.app_name,
-        onCardClick = onCardClick,
-        onCardEditClick = onCardEditClick,
-        onCardReviewed = {
-            viewModel.reviewCard(it)
-        }
-    )
+    if(uiState.isLoading){
+        CenterCircularProgressIndicator()
+    }else{
+        CardFeedContent(
+            cards = uiState.cards,
+            currentFilteringLabel = R.string.app_name,
+            onCardClick = onCardClick,
+            onCardEditClick = onCardEditClick,
+            onCardReviewed = {
+                viewModel.reviewCard(it)
+            }
+        )
+    }
 }

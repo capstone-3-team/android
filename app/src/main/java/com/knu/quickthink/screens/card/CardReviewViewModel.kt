@@ -51,7 +51,6 @@ class CardReviewViewModel @Inject constructor(
     }
     fun deleteCard(){
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             cardRepository.deleteCard(_uiState.value.myCard.id)
                 .onSuccess {
                     _uiState.update { it.copy(isDeleted = true) }
