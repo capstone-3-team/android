@@ -1,13 +1,13 @@
 package com.knu.quickthink.model.card
 
-data class Card(
-    val id: String="",
-    val title: String = "",
-    val content: String = "",
-    val hashTags : List<String> = listOf(),
-    val reviewCount : Int = 0,
-    val userId : Int = 0,
-    val isCompleted: Boolean = false,
-    val writtenDate : String = "2023-04-23T07:40:58.008Z",
-    val latestReviewDate : String = "2023-04-23T07:40:58.008Z",
+import java.time.LocalDateTime
+
+open class Card(
+    open val id: Long,
+    open val title: String,
+    open val content: String,
+    open val isYours : Boolean,
+    open val hashTags : HashSet<String>,
+    open val writtenDate : LocalDateTime,
 )
+

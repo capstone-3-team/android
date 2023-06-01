@@ -20,18 +20,20 @@ import androidx.compose.ui.unit.dp
 import com.dokar.chiptextfield.*
 import com.knu.quickthink.R
 import com.knu.quickthink.model.card.Card
-import com.knu.quickthink.screens.main.testCard3
+import com.knu.quickthink.model.card.HashTags
+import com.knu.quickthink.model.card.dummyHashTags
+import com.knu.quickthink.model.card.mycard.dummyMyCard
 import timber.log.Timber
 
 @Composable
 fun HashTagTextField(
-    card : Card,
+    hashTags: HashTags,
     modifier: Modifier = Modifier,
     readOnly : Boolean = true,
     onChipClicked: (String, Boolean) -> Unit,
     onChipDeleteClicked: (String, Boolean) -> Unit
 ) {
-    val state = rememberChipTextFieldState(chips = card.hashTags.map { HashTagChip(it)}.toList())
+    val state = rememberChipTextFieldState(chips = hashTags.hashTags.map { HashTagChip(it)}.toList())
     val interactionSource = remember {
         MutableInteractionSource()
     }
@@ -85,7 +87,7 @@ fun HashTagTextFieldPrev(){
     Column() {
         Spacer(modifier = Modifier.weight(0.8f))
         HashTagTextField(
-            card = testCard3,
+            hashTags = dummyHashTags,
             onChipClicked ={_,_ ->} ,
             onChipDeleteClicked = { _, _ ->}
         )
