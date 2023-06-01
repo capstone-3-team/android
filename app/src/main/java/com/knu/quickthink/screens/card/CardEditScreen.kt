@@ -50,6 +50,7 @@ fun CardEditScreen(
     val focusRequester = remember { FocusRequester() }
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    var firstRendering by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit){
         viewModel.fetchMyCard(cardId)
@@ -57,10 +58,10 @@ fun CardEditScreen(
     // 키보드 닫혔을 때 clearFocus && updateContent
     LaunchedEffect(isKeyboardOpen) {
         Timber.tag("cardEdit").d("LaunchedEffect isKeyboardOpen $isKeyboardOpen")
-        if (!isKeyboardOpen) {
+        if (!isKeyboardOpen && !firstRendering) {
             focusManager.clearFocus()
             viewModel.updateCard()
-        }
+        }else firstRendering = false
     }
     LaunchedEffect(Unit){
         // 키보드에 따라 window크기 조절을 위해 필요한 부분으로 이해함

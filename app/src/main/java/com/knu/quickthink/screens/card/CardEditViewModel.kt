@@ -64,10 +64,12 @@ class CardEditViewModel @Inject constructor(
                 updateCardRequest = UpdateCardRequest(
                     title = card.title,
                     content = uiState.value.content.text,                       // content는 textFieldValue로 따로 관리하기 때문에 직접 가져와줘야함
-                    hashTags = HashTags(card.hashTags.toList()),
+                    hashTags = card.hashTags.toList(),
                     writtenDate = card.writtenDate
                 )
-            )
+            ).onErrorOrException { code, message ->
+                Timber.e("updateCard onError : code $code , message $message")
+            }
         }
         _uiState.update { it.copy(isContentEditing = false) }
     }
@@ -82,7 +84,7 @@ class CardEditViewModel @Inject constructor(
                 cardRepository.fetchMyCard(cardId)
                     .onSuccess {
                         updateUiState(uiState.value.copy(
-                            myCard = it,
+                            myCard = it.copy(id = cardId),
                             content = uiState.value.content.copy(text = it.content),
                             isLoading = false
                         ))
