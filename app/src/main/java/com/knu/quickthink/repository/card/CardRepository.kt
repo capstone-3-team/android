@@ -7,7 +7,7 @@ import com.knu.quickthink.model.card.otherscard.OthersCard
 
 interface CardRepository {
 
-    suspend fun createCard(createCardRequest: CreateCardRequest) : NetworkResult<String>
+    suspend fun createCard(createCardRequest: CreateCardRequest) : NetworkResult<CreateCardResponse>
 
     suspend fun fetchMyCard(cardId : Long) : NetworkResult<MyCard>
 

@@ -1,10 +1,7 @@
 package com.knu.quickthink.network.apiService
 
 import com.knu.quickthink.model.NetworkResult
-import com.knu.quickthink.model.card.Cards
-import com.knu.quickthink.model.card.CreateCardRequest
-import com.knu.quickthink.model.card.HashTags
-import com.knu.quickthink.model.card.UpdateCardRequest
+import com.knu.quickthink.model.card.*
 import com.knu.quickthink.model.card.mycard.MyCard
 import retrofit2.http.*
 
@@ -13,7 +10,7 @@ interface MyCardApiService {
     @POST("api/card/write")
     suspend fun createCard(
         @Body createCardRequest : CreateCardRequest
-    ): NetworkResult<String>
+    ): NetworkResult<CreateCardResponse>
 
     @GET("api/card/single")
     suspend fun fetchMyCard(

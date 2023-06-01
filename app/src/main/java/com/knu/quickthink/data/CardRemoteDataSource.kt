@@ -12,7 +12,7 @@ class CardRemoteDataSource @Inject constructor(
     private val myCardApiService: MyCardApiService,
     private val othersCardApiService: OthersCardApiService
 ) {
-    suspend fun createCard(createCardRequest: CreateCardRequest) : NetworkResult<String>
+    suspend fun createCard(createCardRequest: CreateCardRequest) : NetworkResult<CreateCardResponse>
         = myCardApiService.createCard(createCardRequest)
 
     suspend fun fetchMyCard(cardId : Long) : NetworkResult<MyCard>

@@ -3,6 +3,7 @@ package com.knu.quickthink.screens.card
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.knu.quickthink.model.card.CreateCardRequest
 import com.knu.quickthink.model.card.HashTags
 import com.knu.quickthink.model.card.UpdateCardRequest
 import com.knu.quickthink.model.card.mycard.MyCard
@@ -78,9 +79,11 @@ class CardEditViewModel @Inject constructor(
      *  fetchContent  -> 처음 카드 내용 가져오기
      *  */
     fun fetchMyCard(cardId : Long){
-        if(cardId > -1){
-            viewModelScope.launch {
-                updateUiState(_uiState.value.copy(isLoading = true))
+        viewModelScope.launch {
+            updateUiState(_uiState.value.copy(isLoading = true))
+            if (cardId == -1L){
+                createMyCard()
+            }else{
                 cardRepository.fetchMyCard(cardId)
                     .onSuccess {
                         updateUiState(uiState.value.copy(
@@ -97,6 +100,19 @@ class CardEditViewModel @Inject constructor(
                     }
             }
         }
+    }
+
+    private suspend fun createMyCard() {
+        cardRepository.createCard(CreateCardRequest())
+            .onSuccess {
+                updateUiState(_uiState.value.copy(
+                    myCard = uiState.value.myCard.copy(id = it.cardId),
+                    isLoading = false
+                ))
+            }
+            .onErrorOrException{ code: Int, message: String? ->
+                Timber.e("updateCard onError : code $code , message $message")
+            }
     }
 
     fun updateUiState(newState : CardEditUiState){

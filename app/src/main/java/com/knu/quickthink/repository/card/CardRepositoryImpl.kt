@@ -18,7 +18,7 @@ class CardRepositoryImpl @Inject constructor(
     private val userManager: UserManager
 ) : CardRepository{
 
-    override suspend fun createCard(createCardRequest: CreateCardRequest): NetworkResult<String> {
+    override suspend fun createCard(createCardRequest: CreateCardRequest): NetworkResult<CreateCardResponse> {
         return remoteDataSource.createCard(createCardRequest)
     }
 
