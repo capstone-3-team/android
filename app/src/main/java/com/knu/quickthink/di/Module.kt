@@ -5,6 +5,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.knu.quickthink.R
+import com.knu.quickthink.network.AuthInterceptor
+import com.knu.quickthink.network.UserManager
 import com.knu.quickthink.network.networkResultCallAdapter.NetworkResultCallAdapterFactory
 import com.knu.quickthink.network.nullOnEmptyConverter.NullOnEmptyConverterFactory
 import dagger.Module
@@ -12,6 +14,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -20,6 +24,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
 import java.io.IOException
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Module
@@ -58,8 +63,9 @@ object Module{
     @Singleton
     @Provides
     fun provideAuthInterceptor(
+        userManager: UserManager
     ): AuthInterceptor {
-        return AuthInterceptor()
+        return AuthInterceptor(userManager)
     }
 
     @Provides
@@ -71,22 +77,11 @@ object Module{
             .build()
         return GoogleSignIn.getClient(context, gso)
     }
-}
 
-class AuthInterceptor : Interceptor {
-    @Throws(IOException::class)
-    override fun intercept(chain: Interceptor.Chain): Response {
-        val newRequest = chain.request().newBuilder()
-            .addHeader("Content-Type","application/json")
-            .build()
-
-        val response = chain.proceed(newRequest)
-        if(response.header("Authorization") != null){
-            // token이 vaild할 경우 sessionId를 저장해줘야함
-//            sessionManager.setSessionId(response.header("Authorization")!!)
-            Timber.tag("interceptor").d("header Authorization : ${response.header("Authorization")!!}")
-        }
-        // token이 invalid 하면  이미 response 객체에 오류가 붙어서 올거임-> NetworkCallAdapter가 그 뒤에 처리할거임
-        return response
+    @Singleton
+    @Provides
+    fun provideUserManager() : UserManager {
+        return UserManager()
     }
+
 }
