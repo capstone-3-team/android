@@ -2,6 +2,8 @@ package com.knu.quickthink.screens.card
 
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
+import com.knu.quickthink.model.card.mycard.MyCard
+import com.knu.quickthink.model.card.mycard.dummyMyCard
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +14,7 @@ import javax.inject.Inject
 
 
 data class CardEditUiState(
-    val title : String = "",
+    val myCard: MyCard = dummyMyCard,
     val content : TextFieldValue = TextFieldValue(""),
     val isContentEditing : Boolean = false,
     val isPreview : Boolean = false
@@ -34,7 +36,7 @@ class CardViewModel @Inject constructor(
     }
 
     fun editTitle (newTitle : String){
-        _uiState.update { it.copy(title = newTitle) }
+        _uiState.update { it.copy(myCard = it.myCard.copy(title = newTitle)) }
     }
 
     fun startEditing(){
@@ -59,9 +61,11 @@ class CardViewModel @Inject constructor(
     }
 
     fun fetchContent(){
+
+
         _uiState.update { state ->
             state.copy(
-                title =  "제목",
+                myCard = state.myCard.copy(title =  "제목"),
                 content = state.content.copy(text = testMarkdown)
             )
 

@@ -32,7 +32,8 @@ import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.ui.RichText
 import com.knu.quickthink.R
 import com.knu.quickthink.components.HashTagTextField
-import com.knu.quickthink.screens.main.testCard
+import com.knu.quickthink.model.card.dummyHashTags
+import com.knu.quickthink.model.card.mycard.dummyMyCard
 import timber.log.Timber
 
 
@@ -88,13 +89,13 @@ fun CardEditScreen(
 //                    .addFocusCleaner(keyboardController!!)
         ) {
             CardTitle(
-                title = uiState.title,
+                title = uiState.myCard.title,
                 isPreview = uiState.isPreview
             ){
                 viewModel.editTitle(it)
             }
             HashTagTextField(
-                card = testCard,
+                hashTags = dummyHashTags,
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = uiState.isPreview,
                 onChipClicked = { _, _ -> },
