@@ -15,11 +15,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 data class CardReviewUiState(
     val isLoading : Boolean = false,
     val myCard: MyCard = emptyMyCard,
+    val isDeleted : Boolean = false
 )
 
 @HiltViewModel
@@ -36,7 +38,7 @@ class CardReviewViewModel @Inject constructor(
             cardRepository.fetchMyCard(cardId)
                 .onSuccess {
                     uiStateUpdate(uiState.value.copy(
-                        myCard = it,
+                        myCard = it.copy(id = cardId),
                         isLoading = false
                     ))
                 }.onErrorOrException { code, message ->
@@ -44,6 +46,18 @@ class CardReviewViewModel @Inject constructor(
                         myCard = emptyMyCard.copy(content = "카드를 불러오지 못했습니다"),
                         isLoading = false
                     ))
+                }
+        }
+    }
+    fun deleteCard(){
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            cardRepository.deleteCard(_uiState.value.myCard.id)
+                .onSuccess {
+                    _uiState.update { it.copy(isDeleted = true) }
+                }
+                .onErrorOrException { code, message ->
+                    Timber.e("updateCard onError : code $code , message $message")
                 }
         }
     }

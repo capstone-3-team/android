@@ -26,7 +26,8 @@ data class CardEditUiState(
     val myCard: MyCard = emptyMyCard,
     val content : TextFieldValue = TextFieldValue(""),
     val isContentEditing : Boolean = false,
-    val isPreview : Boolean = false
+    val isPreview : Boolean = false,
+    val isDeleted : Boolean = false
 )
 
 @HiltViewModel
@@ -113,6 +114,19 @@ class CardEditViewModel @Inject constructor(
             .onErrorOrException{ code: Int, message: String? ->
                 Timber.e("updateCard onError : code $code , message $message")
             }
+    }
+
+    fun deleteCard(){
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            cardRepository.deleteCard(_uiState.value.myCard.id)
+                .onSuccess {
+                    _uiState.update { it.copy(isDeleted = true) }
+                }
+                .onErrorOrException { code, message ->
+                    Timber.e("updateCard onError : code $code , message $message")
+                }
+        }
     }
 
     fun updateUiState(newState : CardEditUiState){

@@ -32,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.ui.RichText
 import com.knu.quickthink.R
+import com.knu.quickthink.components.CardDeleteConfirmDialog
 import com.knu.quickthink.components.CenterCircularProgressIndicator
 import com.knu.quickthink.components.HashTagTextField
 import com.knu.quickthink.utils.convertDateFormat
@@ -51,9 +52,15 @@ fun CardEditScreen(
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     var firstRendering by remember { mutableStateOf(true) }
+    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit){
         viewModel.fetchMyCard(cardId)
+        // 키보드에 따라 window크기 조절을 위해 필요한 부분으로 이해함
+        val window = (context as? Activity)?.window
+        if (window != null) {
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+        }
     }
     // 키보드 닫혔을 때 clearFocus && updateContent
     LaunchedEffect(isKeyboardOpen) {
@@ -63,18 +70,24 @@ fun CardEditScreen(
             viewModel.updateCard()
         }else firstRendering = false
     }
-    LaunchedEffect(Unit){
-        // 키보드에 따라 window크기 조절을 위해 필요한 부분으로 이해함
-        val window = (context as? Activity)?.window
-        if (window != null) {
-            WindowCompat.setDecorFitsSystemWindows(window, false)
+
+    LaunchedEffect(uiState.isDeleted){
+        if(uiState.isDeleted){
+            onBackClicked()
         }
     }
 
-    LaunchedEffect(uiState.myCard, uiState.content){
-        Timber.d("myCard : ${uiState.myCard}")
-        Timber.d("content : ${uiState.content.text}")
+    if(showDeleteConfirmDialog){
+        CardDeleteConfirmDialog(
+            onDeleteBtnClicked = { viewModel.deleteCard() },
+            onCloseBtnClicked = { showDeleteConfirmDialog = false }
+        )
     }
+
+//    LaunchedEffect(uiState.myCard, uiState.content){
+//        Timber.d("myCard : ${uiState.myCard}")
+//        Timber.d("content : ${uiState.content.text}")
+//    }
 
     if(uiState.isLoading){
         CenterCircularProgressIndicator()
@@ -86,9 +99,12 @@ fun CardEditScreen(
             topBar = {
                 CardEditTopAppBar(
                     isPreview = uiState.isPreview,
-                    onBackClicked = onBackClicked,
+                    onBackClicked = {
+                        viewModel.updateCard()
+                        onBackClicked()
+                    },
                     onPreviewEditClicked = { viewModel.reverseIsPreview() },
-                    onDeleteClicked = {},
+                    onDeleteClicked = { showDeleteConfirmDialog = true },
                 )
             }
         ) { paddingValues ->

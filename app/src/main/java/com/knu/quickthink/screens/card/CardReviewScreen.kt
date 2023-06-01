@@ -7,14 +7,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -22,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.flowlayout.FlowRow
 import com.knu.quickthink.R
+import com.knu.quickthink.components.CardDeleteConfirmDialog
 import com.knu.quickthink.components.CenterCircularProgressIndicator
 import com.knu.quickthink.screens.card.CardReviewViewModel
 
@@ -32,13 +31,26 @@ fun CardReviewScreen(
     onEditBtnClicked : (Long) -> Unit,
     onCloseBtnClicked : () -> Unit
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
+    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
     val card = uiState.myCard
 
     LaunchedEffect(Unit){
         viewModel.fetchMyCard(cardId)
     }
+    LaunchedEffect(uiState.isDeleted){
+        if(uiState.isDeleted){
+            onCloseBtnClicked()
+        }
+    }
+    if(showDeleteConfirmDialog){
+        CardDeleteConfirmDialog(
+            onDeleteBtnClicked = { viewModel.deleteCard() },
+            onCloseBtnClicked = { showDeleteConfirmDialog = false }
+        )
+    }
+
+
     if(uiState.isLoading){
         CenterCircularProgressIndicator()
     }else{
@@ -66,7 +78,7 @@ fun CardReviewScreen(
                     )
                 }
                 IconButton(
-                    onClick = {},
+                    onClick = { showDeleteConfirmDialog = true },
                     modifier = Modifier.weight(0.1f)
                 ){
                     Icon(
@@ -124,12 +136,15 @@ fun CardReviewScreen(
                 onClick = { /*TODO*/ },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(dimensionResource(id = R.dimen.vertical_margin))
+                    .padding(dimensionResource(id = R.dimen.vertical_margin)),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = colorResource(id = R.color.quickThink_blue),
+                    contentColor = Color.White
+                )
             ) {
                 Text(
                     text = "Review",
                     style = MaterialTheme.typography.h6,
-                    color = Color.White
                 )
             }
         }
