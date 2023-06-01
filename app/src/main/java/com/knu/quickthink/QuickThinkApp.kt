@@ -14,6 +14,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
@@ -29,33 +30,47 @@ import com.knu.quickthink.ui.theme.QuickThinkTheme
 import kotlinx.coroutines.launch
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.bottomSheet
+import com.knu.quickthink.di.Module.provideUserManager
+import com.knu.quickthink.network.UserManager
 import com.knu.quickthink.screens.account.AccountScreen
 import com.knu.quickthink.screens.card.CardEditScreen
 import com.knu.quickthink.screens.login.LoginScreen
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialNavigationApi::class,ExperimentalComposeUiApi::class)
 @Composable
 fun QuickThinkApp(
     appState: QuickThinkAppState = rememberQuickThinkAppState(),
-    mainViewModel: MainViewModel = hiltViewModel()
+    mainViewModel: MainViewModel = hiltViewModel(),
 ) {
+    val userState by mainViewModel.userState.collectAsState()
+    var firstRendering by remember { mutableStateOf(true) }
+    Timber.d("userState : ${userState}")
+    Timber.d("firstRendering : ${firstRendering}")
+    LaunchedEffect(userState){
+        if(!userState.isLoggedIn && !firstRendering){
+            appState.navController.navigate(
+                MainDestination.LOGIN_ROUTE,
+                navOptions {
+                    popUpTo(MainDestination.LOGIN_ROUTE){inclusive = true}
+                }
+            )
+        }else firstRendering = false
+    }
+//    val isLogOutSuccess by mainViewModel.isLogOutSuccess.collectAsState()
+//    LaunchedEffect(isLogOutSuccess){
+//        if(isLogOutSuccess){
+//            appState.navController.navigate(
+//                MainDestination.LOGIN_ROUTE,
+//                navOptions {
+//                    popUpTo(MainDestination.LOGIN_ROUTE){inclusive = true}
+//                }
+//            )
+//            mainViewModel.logOutFinish()
+//        }
+//    }
     QuickThinkTheme {
-        val context = LocalContext.current as Activity
         appState.navController.navigatorProvider += appState.bottomSheetNavigator
-
-        val isLogOutSuccess by mainViewModel.isLogOutSuccess.collectAsState()
-        LaunchedEffect(isLogOutSuccess){
-            if(isLogOutSuccess){
-                appState.navController.navigate(
-                    MainDestination.LOGIN_ROUTE,
-                    navOptions {
-                        popUpTo(MainDestination.LOGIN_ROUTE){inclusive = true}
-                    }
-                )
-                mainViewModel.logOutFinish()
-            }
-        }
-
         ModalBottomSheetLayout(
             bottomSheetNavigator = appState.bottomSheetNavigator,
             sheetShape = RoundedCornerShape(20.dp)
@@ -72,7 +87,7 @@ fun QuickThinkApp(
                             }
                         },
                         onChatGPTClicked = { appState.navController.navigate(MainDestination.CHATGPT_ROUTE) },
-                        onSignOutClicked = { mainViewModel.logOut() },
+                        onSignOutClicked = { mainViewModel.logout() },
                         onAccountClicked = { appState.navController.navigate(MainDestination.ACCOUNT_ROUTE) },
                     )
                 }

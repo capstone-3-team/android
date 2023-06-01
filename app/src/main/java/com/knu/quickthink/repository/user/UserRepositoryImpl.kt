@@ -130,6 +130,7 @@ class UserRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Timber.tag("googleLogin").e("logOut Error Exception : ${e.message}")
         }
+        if(isLoggedOut) userManager.logout()
         return isLoggedOut
     }
 

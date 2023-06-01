@@ -19,7 +19,7 @@ class UserManager {
     private val _userState = MutableStateFlow(UserState())
     val userState : StateFlow<UserState> = _userState.asStateFlow()
 
-    fun login(userToken: String, googleId: String){
+     fun login(userToken: String, googleId: String){
         _userState.update { state ->
             state.copy(userToken = userToken, googleId = googleId, isLoggedIn = true)
         }
