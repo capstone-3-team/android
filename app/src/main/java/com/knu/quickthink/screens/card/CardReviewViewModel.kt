@@ -61,7 +61,17 @@ class CardReviewViewModel @Inject constructor(
         }
     }
 
-    /*TODO : review Card*/
+    fun reviewCard(){
+        viewModelScope.launch {
+            cardRepository.reviewCard(_uiState.value.myCard.id)
+                .onSuccess {
+                    _uiState.update { state ->
+                        state.copy(myCard = state.myCard.copy(reviewCount = state.myCard.reviewCount+1)) }
+                }.onErrorOrException { code, message ->
+                    Timber.e("updateCard onError : code $code , message $message")
+                }
+        }
+    }
 
     private fun uiStateUpdate(newState : CardReviewUiState){
         _uiState.update {newState}

@@ -23,6 +23,8 @@ import com.knu.quickthink.R
 import com.knu.quickthink.components.CardDeleteConfirmDialog
 import com.knu.quickthink.components.CenterCircularProgressIndicator
 import com.knu.quickthink.screens.card.CardReviewViewModel
+import com.knu.quickthink.screens.card.CardStatusRow
+import com.knu.quickthink.utils.convertDateFormat
 
 @Composable
 fun CardReviewScreen(
@@ -108,7 +110,7 @@ fun CardReviewScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.8f)
+                    .weight(0.7f)
                 ,
                 contentAlignment = Alignment.TopStart
             ) {
@@ -121,7 +123,8 @@ fun CardReviewScreen(
             }
             FlowRow(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .weight(.15f),
                 mainAxisSpacing = 5.dp,
             ) {
                 card.hashTags.forEach { hashTag ->
@@ -132,10 +135,20 @@ fun CardReviewScreen(
                     )
                 }
             }
+            CardStatusRow(
+                modifier = Modifier.fillMaxWidth().weight(.1f),
+                reviewCount = uiState.myCard.reviewCount,
+                writtenDate = convertDateFormat(uiState.myCard.writtenDate),
+                latestReviewDate = convertDateFormat(uiState.myCard.latestReviewDate)
+            )
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    viewModel.reviewCard()
+                    onCloseBtnClicked()
+                },
                 modifier = Modifier
                     .fillMaxWidth()
+                    .weight(.15f)
                     .padding(dimensionResource(id = R.dimen.vertical_margin)),
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = colorResource(id = R.color.quickThink_blue),
