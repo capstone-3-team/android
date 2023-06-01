@@ -7,9 +7,11 @@ import com.knu.quickthink.model.card.Cards
 import com.knu.quickthink.model.card.HashTags
 import com.knu.quickthink.model.card.emptyMyCards
 import com.knu.quickthink.model.card.mycard.MyCard
+import com.knu.quickthink.model.converter.convertMyCardsDate
 import com.knu.quickthink.model.onErrorOrException
 import com.knu.quickthink.model.onSuccess
 import com.knu.quickthink.repository.card.CardRepository
+import com.knu.quickthink.utils.convertDateFormat
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,7 +46,7 @@ class FeedViewModel @Inject constructor(
             cardRepository.fetchMyCards(_uiState.value.hashTags)
                 .onSuccess {
                     _uiState.update { state ->
-                        state.copy(cards = it, isLoading = false)
+                        state.copy(cards = convertMyCardsDate(it), isLoading = false)
                     }
                 }.onErrorOrException{ code, message ->
                     Timber.d("code : $code  message : $message")

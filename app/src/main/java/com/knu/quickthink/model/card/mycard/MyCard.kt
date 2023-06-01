@@ -1,6 +1,7 @@
 package com.knu.quickthink.model.card.mycard
 
 import com.knu.quickthink.model.card.Card
+import com.knu.quickthink.utils.convertDateFormat
 import java.time.LocalDateTime
 
 data class MyCard(
@@ -20,8 +21,8 @@ val emptyMyCard = MyCard(
     isYours = true,
     content = "내용을 입력해주세요",
     hashTags = emptyList<String>().toHashSet(),
-    writtenDate = "",
-    latestReviewDate = "",
+    writtenDate = convertDateFormat(LocalDateTime.now().toString()),
+    latestReviewDate = convertDateFormat(LocalDateTime.now().toString()),
     reviewCount = 0
 )
 

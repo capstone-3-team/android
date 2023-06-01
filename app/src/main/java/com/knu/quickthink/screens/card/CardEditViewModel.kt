@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.knu.quickthink.model.card.mycard.MyCard
 import com.knu.quickthink.model.card.mycard.dummyMyCard
 import com.knu.quickthink.model.card.mycard.emptyMyCard
+import com.knu.quickthink.model.converter.convertMyCardDate
 import com.knu.quickthink.model.onErrorOrException
 import com.knu.quickthink.model.onSuccess
 import com.knu.quickthink.repository.card.CardRepository
@@ -77,7 +78,7 @@ class CardEditViewModel @Inject constructor(
                 cardRepository.fetchMyCard(cardId)
                     .onSuccess {
                         uiStateUpdate(uiState.value.copy(
-                            myCard = it,
+                            myCard = convertMyCardDate(it),
                             content = uiState.value.content.copy(text = it.content),
                             isLoading = false
                         ))
