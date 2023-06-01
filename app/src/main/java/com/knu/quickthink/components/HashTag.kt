@@ -88,7 +88,11 @@ fun HashTagTextField(
                 alignment = Alignment.Center,
                 modifier = Modifier
                     .size(18.dp)
-                    .clickable { onChipDeleteClicked("", false) },
+                    .clickable {
+                        state.removeChip(it)
+                        val chips = state.chips.map { it.text }
+                        onChipUpdated(chips)
+                    },
                 colorFilter = ColorFilter.tint(Color.White)
             )
         },
