@@ -9,6 +9,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.knu.quickthink.navigation.MainDestination
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 
@@ -51,6 +52,8 @@ class QuickThinkAppState(
     val currentRoute: String?
         @Composable get() = navController.currentBackStackEntryAsState().value?.destination?.route
 
+    val isMyFeedScreen : Boolean
+        @Composable get() = navController.currentBackStackEntryAsState().value?.destination?.route == MainDestination.FEED_ROUTE
 }
 
 @ExperimentalMaterialNavigationApi

@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.ParagraphIntrinsics
@@ -31,15 +32,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.ui.RichText
 import com.knu.quickthink.R
+import com.knu.quickthink.components.CenterCircularProgressIndicator
 import com.knu.quickthink.components.HashTagTextField
 import com.knu.quickthink.model.card.dummyHashTags
-import com.knu.quickthink.model.card.mycard.dummyMyCard
 import timber.log.Timber
 
 
 @Composable
 fun CardEditScreen(
-    viewModel: CardViewModel = hiltViewModel(),
+    cardId : Long,
+    viewModel: CardEditViewModel = hiltViewModel(),
     onBackClicked: () -> Unit,
     onDoneClicked: () -> Unit
 ) {
@@ -49,6 +51,9 @@ fun CardEditScreen(
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
+    LaunchedEffect(Unit){
+        viewModel.fetchMyCard(cardId)
+    }
     // 키보드 닫혔을 때 clearFocus && updateContent
     LaunchedEffect(isKeyboardOpen) {
         Timber.tag("cardEdit").d("LaunchedEffect isKeyboardOpen $isKeyboardOpen")
@@ -64,51 +69,59 @@ fun CardEditScreen(
             WindowCompat.setDecorFitsSystemWindows(window, false)
         }
     }
-    Scaffold(
-        modifier = Modifier
-            .systemBarsPadding()
-            .navigationBarsPadding(),
-        topBar = {
-            CardEditTopAppBar(
-                isPreview = uiState.isPreview,
-                onBackClicked = onBackClicked,
-                onPreviewEditClicked = { viewModel.reverseIsPreview() },
-                onDeleteClicked = {},
-            )
-        }
-    ) { paddingValues ->
-        Column(
+    if(uiState.isLoading){
+        CenterCircularProgressIndicator()
+    }else{
+        Scaffold(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
-                .padding(paddingValues)
-                .padding(
-                    start = dimensionResource(id = R.dimen.horizontal_margin),
-                    end = dimensionResource(id = R.dimen.horizontal_margin)
+                .systemBarsPadding()
+                .navigationBarsPadding(),
+            topBar = {
+                CardEditTopAppBar(
+                    isPreview = uiState.isPreview,
+                    onBackClicked = onBackClicked,
+                    onPreviewEditClicked = { viewModel.reverseIsPreview() },
+                    onDeleteClicked = {},
                 )
-//                    .addFocusCleaner(keyboardController!!)
-        ) {
-            CardTitle(
-                title = uiState.myCard.title,
-                isPreview = uiState.isPreview
-            ){
-                viewModel.editTitle(it)
             }
-            HashTagTextField(
-                hashTags = dummyHashTags,
-                modifier = Modifier.fillMaxWidth(),
-                readOnly = uiState.isPreview,
-                onChipClicked = { _, _ -> },
-                onChipDeleteClicked = { _, _ -> }
-            )
-            CardContent(
-                uiState = uiState,
-                focusRequester = focusRequester,
-//                    contentImePadding = contentImePadding,
-                onFocusChanged = {},
-                onValueChange = { viewModel.editContent(it) },
-                onContentClicked = { viewModel.reverseIsPreview() }
-            )
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White)
+                    .padding(paddingValues)
+                    .padding(
+                        start = dimensionResource(id = R.dimen.horizontal_margin),
+                        end = dimensionResource(id = R.dimen.horizontal_margin)
+                    )
+    //                    .addFocusCleaner(keyboardController!!)
+            ) {
+                CardTitle(
+                    title = uiState.myCard.title,
+                    isPreview = uiState.isPreview
+                ){
+                    viewModel.editTitle(it)
+                }
+                HashTagTextField(
+                    hashTags = dummyHashTags,
+                    modifier = Modifier.fillMaxWidth(),
+//                    enabled = uiState.isPreview,
+                    readOnly = uiState.isPreview,
+                    onChipClicked = { _, _ -> },
+                    onChipDeleteClicked = { _, _ -> }
+                )
+                CardContent(
+                    uiState = uiState,
+//                    focusRequester = focusRequester,
+    //                    contentImePadding = contentImePadding,
+                    onFocusChanged = {focusState ->
+                        if(focusState.isFocused || focusState.hasFocus) viewModel.startEditing()
+                        else viewModel.finishEditing()
+                    },
+                    onValueChange = { viewModel.editContent(it) },
+                    onContentClicked = { viewModel.reverseIsPreview() }
+                )
+            }
         }
     }
 }
@@ -116,7 +129,7 @@ fun CardEditScreen(
 @Composable
 fun CardContent(
     uiState: CardEditUiState,
-    focusRequester: FocusRequester,
+//    focusRequester: FocusRequester,
 //    contentImePadding :Dp,
     onFocusChanged : (FocusState) -> Unit,
     onValueChange: (TextFieldValue) -> Unit,
@@ -138,83 +151,84 @@ fun CardContent(
 //            .padding(bottom = contentImePadding)
         targetState = uiState.isPreview
     ) { targetState ->
-        when (targetState) {
-            true -> {
-                RichText(
-                    modifier = Modifier
-                        .verticalScroll(scrollState)
-                        .fillMaxSize()
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null,                                            // 클릭 꾹 누르면 검은색으로 변하는 상호작용 없애주기 위함,
-                            onClick = onContentClicked
-                        )
-                ) {
-                    Markdown(content = uiState.content.text)
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = dimensionResource(id = R.dimen.vertical_margin))
+                .border(
+                    width = 2.dp,
+                    color = if (uiState.isContentEditing) Color.Blue else Color.LightGray,
+                    shape = MaterialTheme.shapes.small
+                )
+        ) {
+            when (targetState) {
+                true -> {
+                    RichText(
+                        modifier = Modifier
+                            .padding(dimensionResource(id = R.dimen.horizontal_margin))
+                            .verticalScroll(scrollState)
+                            .fillMaxSize()
+                            .clickable(
+                                interactionSource = interactionSource,
+                                indication = null,                                            // 클릭 꾹 누르면 검은색으로 변하는 상호작용 없애주기 위함,
+                                onClick = onContentClicked
+                            )
+                    ) {
+                        Markdown(content = uiState.content.text)
+                    }
                 }
-            }
-            false -> {
-                BoxWithConstraints(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(vertical = dimensionResource(id = R.dimen.vertical_margin))
-                        .border(
-                            width = 2.dp,
-                            color = if (uiState.isContentEditing) Color.Blue else Color.LightGray,
-                            shape = MaterialTheme.shapes.small
+                false -> {
+                        val horizontalPadding = with(LocalDensity.current){
+                            2 * dimensionResource(id = R.dimen.horizontal_margin).toPx().toInt()
+                        }
+                        /* 현재 커서가 몇 번째 라인인지 찾기*/
+                        val paragraph = calculateParagraph(
+                            text = extractedText,
+                            maxWidth = constraints.maxWidth - horizontalPadding ,
+                            textStyle = contentTextStyle
                         )
-                ) {
-                    val horizontalPadding = with(LocalDensity.current){
-                        2 * dimensionResource(id = R.dimen.horizontal_margin).toPx().toInt()
-                    }
-                    /* 현재 커서가 몇 번째 라인인지 찾기*/
-                    val paragraph = calculateParagraph(
-                        text = extractedText,
-                        maxWidth = constraints.maxWidth - horizontalPadding ,
-                        textStyle = contentTextStyle
-                    )
-                    /* 커서 위치에 따라 스크롤 처리 */
-                    LaunchedEffect(uiState.content){
-                        scrollState.animateScrollTo(
-                            (paragraph.lineCount-1) * lineHeightPx.toInt()
-                        )
-                    }
+                        /* 커서 위치에 따라 스크롤 처리 */
+                        LaunchedEffect(uiState.content){
+                            scrollState.animateScrollTo(
+                                (paragraph.lineCount-1) * lineHeightPx.toInt()
+                            )
+                        }
 
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ){
-                        OutlinedTextField(
-                            value = uiState.content,
-                            modifier = Modifier
-                                .verticalScroll(scrollState)
-                                .focusRequester(focusRequester)
-                                .onFocusChanged(onFocusChanged),
-                            onValueChange = onValueChange,
-                            textStyle = contentTextStyle,
-                            placeholder = { Text(stringResource(id = R.string.default_card_content)) },
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                backgroundColor = Color.Transparent,
-                                focusedBorderColor = Color.Transparent,
-                                unfocusedBorderColor = Color.Transparent
-                            ),
-                            shape = MaterialTheme.shapes.small
-                        )
-                        Box(
-                            Modifier
-                                .fillMaxSize()
-                                .clickable(
-                                    interactionSource = interactionSource,
-                                    indication = null
-                                ) {
-                                    focusRequester.requestFocus()
-                                }
-                        )
-//                                Timber.tag("paragraph").d("${paragraph.lineCount}")
-//                                Timber.tag("paragraph").d("${paragraph.height}")
+                        Column(
+                            modifier = Modifier.fillMaxSize()
+                        ){
+                            OutlinedTextField(
+                                value = uiState.content,
+                                modifier = Modifier
+                                    .verticalScroll(scrollState)
+                                    //                                .focusRequester(focusRequester)
+                                    .onFocusChanged(onFocusChanged),
+                                onValueChange = onValueChange,
+                                textStyle = contentTextStyle,
+                                placeholder = { Text(stringResource(id = R.string.default_card_content)) },
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    backgroundColor = Color.Transparent,
+                                    focusedBorderColor = Color.Transparent,
+                                    unfocusedBorderColor = Color.Transparent
+                                ),
+                                shape = MaterialTheme.shapes.small
+                            )
+    //                        Box(
+    //                            Modifier
+    //                                .fillMaxSize()
+    //                                .clickable(
+    //                                    interactionSource = interactionSource,
+    //                                    indication = null
+    //                                ) {
+    //                                    focusRequester.requestFocus()
+    //                                }
+    //                        )
+    //                                Timber.tag("paragraph").d("${paragraph.lineCount}")
+    //                                Timber.tag("paragraph").d("${paragraph.height}")
+                        }
                     }
                 }
             }
-        }
     }
 
 }
@@ -300,8 +314,8 @@ fun CardEditTopAppBar(
                             )
                         }else{
                             Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = "show preview",
+                                painter = painterResource(id = R.drawable.preview),
+                                contentDescription = "preview"
                             )
                         }
                     }
@@ -363,7 +377,7 @@ fun extractTextUntilCursor(textFieldValue: TextFieldValue): String {
 @Composable
 fun CardEditPrev() {
     Surface {
-        CardEditScreen(onBackClicked = {}, onDoneClicked = {})
+        CardEditScreen(-1,onBackClicked = {}, onDoneClicked = {})
     }
 }
 

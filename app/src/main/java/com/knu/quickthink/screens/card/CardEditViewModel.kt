@@ -2,34 +2,42 @@ package com.knu.quickthink.screens.card
 
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.knu.quickthink.model.card.mycard.MyCard
 import com.knu.quickthink.model.card.mycard.dummyMyCard
+import com.knu.quickthink.model.card.mycard.emptyMyCard
+import com.knu.quickthink.model.onErrorOrException
+import com.knu.quickthink.model.onSuccess
+import com.knu.quickthink.repository.card.CardRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 
 data class CardEditUiState(
-    val myCard: MyCard = dummyMyCard,
+    val isLoading : Boolean = false,
+    val myCard: MyCard = emptyMyCard,
     val content : TextFieldValue = TextFieldValue(""),
     val isContentEditing : Boolean = false,
     val isPreview : Boolean = false
 )
 
 @HiltViewModel
-class CardViewModel @Inject constructor(
+class CardEditViewModel @Inject constructor(
+    private val cardRepository: CardRepository
 ): ViewModel(){
 
     private val _uiState  = MutableStateFlow(CardEditUiState())
     val uiState: StateFlow<CardEditUiState> = _uiState.asStateFlow()
 
-    init {
-        fetchContent()
-    }
+//    init {
+//        fetchContent()
+//    }
 
     fun editContent(newContent : TextFieldValue){
         _uiState.update { it.copy(content = newContent) }
@@ -51,7 +59,8 @@ class CardViewModel @Inject constructor(
     fun reverseIsPreview(){
         _uiState.update { it.copy(
             isPreview = !it.isPreview,
-            isContentEditing = !it.isContentEditing)
+//            isContentEditing = !it.isContentEditing
+            )
         }
     }
 
@@ -60,18 +69,32 @@ class CardViewModel @Inject constructor(
         _uiState.update { it.copy(isContentEditing = false) }
     }
 
-    fun fetchContent(){
-
-
-        _uiState.update { state ->
-            state.copy(
-                myCard = state.myCard.copy(title =  "제목"),
-                content = state.content.copy(text = testMarkdown)
-            )
-
+    /* TODO : fetchContent  -> 처음 카드 내용 가져오기*/
+    fun fetchMyCard(cardId : Long){
+        if(cardId > -1){
+            viewModelScope.launch {
+                uiStateUpdate(_uiState.value.copy(isLoading = true))
+                cardRepository.fetchMyCard(cardId)
+                    .onSuccess {
+                        uiStateUpdate(uiState.value.copy(
+                            myCard = it,
+                            content = uiState.value.content.copy(text = it.content),
+                            isLoading = false
+                        ))
+                    }.onErrorOrException { code, message ->
+                        uiStateUpdate(uiState.value.copy(
+                            myCard = emptyMyCard,
+                            content = uiState.value.content.copy(text ="카드를 불러오지 못했습니다"),
+                            isLoading = false
+                        ))
+                    }
+            }
         }
     }
-    /* TODO : fetchContent  -> 처음 카드 내용 가져오기*/
+
+    private fun uiStateUpdate(newState : CardEditUiState){
+        _uiState.update {newState}
+    }
 
     /* TODO: updateContent -> 카드 내용 저장*/
 }

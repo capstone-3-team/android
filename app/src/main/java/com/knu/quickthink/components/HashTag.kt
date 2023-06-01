@@ -29,7 +29,8 @@ import timber.log.Timber
 fun HashTagTextField(
     hashTags: HashTags,
     modifier: Modifier = Modifier,
-    readOnly : Boolean = true,
+    enabled : Boolean = true,
+    readOnly : Boolean = false,
     onChipClicked: (String, Boolean) -> Unit,
     onChipDeleteClicked: (String, Boolean) -> Unit
 ) {
@@ -53,7 +54,11 @@ fun HashTagTextField(
         state = state,
         onSubmit = ::HashTagChip,
         modifier = modifier,
+        enabled = enabled,
         readOnly = readOnly,
+        placeholder = {
+            Text(text = "해시태그를 입력해 주세요")
+        },
         chipStyle = ChipTextFieldDefaults.chipStyle(
             unfocusedBackgroundColor = colorResource(id = R.color.quickThink_blue),
         ),

@@ -14,6 +14,17 @@ data class MyCard(
     val reviewCount : Long
 )
 
+val emptyMyCard = MyCard(
+    id = 0,
+    title = "제목",
+    isYours = true,
+    content = "내용을 입력해주세요",
+    hashTags = emptyList<String>().toHashSet(),
+    writtenDate = "",
+    latestReviewDate = "",
+    reviewCount = 0
+)
+
 val dummyMyCard = MyCard(
     id = 123,
     title = "title1",
