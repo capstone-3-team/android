@@ -60,7 +60,7 @@ fun AccountScreen(
         ) {
             profileImage(
                 imageUrl = profileImage,
-                imageSize = dimensionResource(id = R.dimen.profile_image),
+                imageSize = dimensionResource(id = R.dimen.myProfile_image),
             )
             Text(
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin)),

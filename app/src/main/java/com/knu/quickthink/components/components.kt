@@ -37,7 +37,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import com.airbnb.lottie.compose.*
+import com.knu.quickthink.repository.user.DEFAULT_PROFILE_IMAGE
 import com.knu.quickthink.screens.account.CircularAsyncImage
+import com.knu.quickthink.utils.isURL
 
 
 @Composable
@@ -229,7 +231,7 @@ fun profileImage(
     imageSize : Dp
 ) {
     CircularAsyncImage(
-        imageUrl = imageUrl,
+        imageUrl = if(imageUrl.isURL()) imageUrl else DEFAULT_PROFILE_IMAGE,
         imageSize = imageSize,
         backgroundColor = Color.Transparent,
         contentDescription = "profile image"
