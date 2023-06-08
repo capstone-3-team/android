@@ -152,7 +152,7 @@ fun QuickThinkApp(
                             BoxWithConstraints() {
                                 val sheetHeight = this.constraints.maxHeight * 0.8f
                                 Box(modifier = Modifier.height(with(LocalDensity.current) { sheetHeight.toDp() })) {
-                                    SearchScreen(
+                                    UserSearchScreen(
                                         onCloseClicked = {
                                             appState.navController.popBackStack()
                                         }
