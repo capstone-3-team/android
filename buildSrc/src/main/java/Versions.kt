@@ -7,7 +7,7 @@ object Versions {
     /* Androidx */
     const val CORE_KTX = "1.9.0"
     const val MATERIAL = "1.3.1"
-    const val MATERIAL3 = "1.0.1"
+    const val MATERIAL3 = "1.2.0-alpha01"
     const val COMPOSE_UI = "1.3.3"
     const val COMPOSE_COMPILER = "1.3.2"
     const val COMPOSE_NAVIGATION = "2.5.3"
