@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -34,7 +35,9 @@ import com.knu.quickthink.R
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import com.airbnb.lottie.compose.*
+import com.knu.quickthink.screens.account.CircularAsyncImage
 
 
 @Composable
@@ -218,6 +221,19 @@ fun QuickThinkTopAppBar(
     }
 
 
+}
+
+@Composable
+fun profileImage(
+    imageUrl : String,
+    imageSize : Dp
+) {
+    CircularAsyncImage(
+        imageUrl = imageUrl,
+        imageSize = imageSize,
+        backgroundColor = Color.Transparent,
+        contentDescription = "profile image"
+    )
 }
 
 @Composable

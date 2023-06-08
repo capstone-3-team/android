@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.knu.quickthink.R
+import com.knu.quickthink.components.profileImage
 import timber.log.Timber
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -57,11 +58,9 @@ fun AccountScreen(
             modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.vertical_margin)),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CircularAsyncImage(
+            profileImage(
                 imageUrl = profileImage,
                 imageSize = dimensionResource(id = R.dimen.profile_image),
-                backgroundColor = Color.Transparent,
-                contentDescription = "profile image"
             )
             Text(
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin)),
