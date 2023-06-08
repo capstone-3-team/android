@@ -20,7 +20,7 @@ fun rememberQuickThinkAppState(
     sheetState : ModalBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true,
-        confirmValueChange = { it != ModalBottomSheetValue.Hidden }
+        confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded }
     ),
     bottomSheetNavigator :BottomSheetNavigator = remember{
         BottomSheetNavigator(sheetState)
