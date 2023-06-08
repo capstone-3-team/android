@@ -19,9 +19,12 @@ fun rememberQuickThinkAppState(
     navController: NavHostController = rememberNavController(),
     sheetState : ModalBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true,
         confirmValueChange = { it != ModalBottomSheetValue.Hidden }
     ),
-    bottomSheetNavigator :BottomSheetNavigator = rememberBottomSheetNavigator(),
+    bottomSheetNavigator :BottomSheetNavigator = remember{
+        BottomSheetNavigator(sheetState)
+    },
     coroutineScope :CoroutineScope = rememberCoroutineScope(),
 ) = remember(navController,bottomSheetNavigator,coroutineScope,sheetState){
     QuickThinkAppState(navController,bottomSheetNavigator,coroutineScope,sheetState)
