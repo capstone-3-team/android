@@ -4,7 +4,9 @@ import com.knu.quickthink.model.user.GoogleUserModel
 import com.knu.quickthink.model.user.IntroductionResponse
 import com.knu.quickthink.model.NetworkResult
 import com.knu.quickthink.model.user.TokenValidResponse
+import com.knu.quickthink.model.user.UserListResponse
 import com.knu.quickthink.network.apiService.UserApiService
+import com.knu.quickthink.screens.search.UserInfo
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,5 +30,8 @@ class UserRemoteDataSource @Inject constructor (
 
     suspend fun updateToken(token: String, googleId: String): NetworkResult<String> {
         return userApiService.updateToken(token,googleId)
+    }
+    suspend fun searchUser(searchName: String): NetworkResult<UserListResponse> {
+        return userApiService.searchUser(searchName)
     }
 }

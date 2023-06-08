@@ -12,8 +12,10 @@ import com.knu.quickthink.data.UserTokenDataStore
 import com.knu.quickthink.model.*
 import com.knu.quickthink.model.user.GoogleUserModel
 import com.knu.quickthink.model.user.IntroductionResponse
+import com.knu.quickthink.model.user.UserListResponse
 import com.knu.quickthink.network.RetrofitFailureStateException
 import com.knu.quickthink.network.UserManager
+import com.knu.quickthink.screens.search.UserInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,7 +25,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 const val DEFAULT_PROFILE_IMAGE =
-    "https://img.freepik.com/premium-vector/account-icon-user-icon-vector-graphics_292645-552.jpg?w=996"
+    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
 
 data class User(
     val token :String = "",
@@ -86,6 +88,9 @@ class UserRepositoryImpl @Inject constructor(
             introduction
         )
     }
+
+    override suspend fun searchUser(searchName: String): NetworkResult<UserListResponse> =
+        remoteDataSource.searchUser(searchName)
 
     override suspend fun autoLogin(): Boolean {
         var isLoggedIn = true

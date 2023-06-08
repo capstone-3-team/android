@@ -4,6 +4,8 @@ import com.knu.quickthink.model.user.GoogleUserModel
 import com.knu.quickthink.model.user.IntroductionResponse
 import com.knu.quickthink.model.NetworkResult
 import com.knu.quickthink.model.user.TokenValidResponse
+import com.knu.quickthink.model.user.UserListResponse
+import com.knu.quickthink.screens.search.UserInfo
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -42,7 +44,10 @@ interface UserApiService {
         @Query("googleId") googleId : String,
         @Body text: String
     ) : NetworkResult<String>
-
+    @GET("/api/search")
+    suspend fun searchUser(
+        @Query("searchName") searchName: String
+    ): NetworkResult<UserListResponse>
 
 
 }
