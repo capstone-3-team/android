@@ -1,17 +1,23 @@
 package com.knu.quickthink.screens.main
 
 import android.app.Activity
+import androidx.annotation.StringRes
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
@@ -21,9 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.knu.quickthink.R
-import com.knu.quickthink.components.CardFeedContent
-import com.knu.quickthink.components.CenterCircularProgressIndicator
+import com.knu.quickthink.components.*
+import com.knu.quickthink.model.card.Cards
 import com.knu.quickthink.model.card.HashTagItem
+import com.knu.quickthink.model.card.dummyMyCards
+import com.knu.quickthink.model.card.mycard.MyCard
+import com.knu.quickthink.model.card.mycard.dummyMyCard
 import com.knu.quickthink.screens.feed.FeedViewModel
 import timber.log.Timber
 
@@ -49,88 +58,114 @@ fun FeedScreen(
             onHashTagClicked = {viewModel.hashTagSelect(it)},
             onFilterBtnClicked = {}
         )
-        if(uiState.isLoading){
-            CenterCircularProgressIndicator()
-        }else {
-            CardFeedContent(
-                cards = uiState.cards,
-                currentFilteringLabel = R.string.app_name,
-                onCardClick = onCardClick,
-                onCardEditClick = onCardEditClick,
-                onCardReviewed = {
-                    viewModel.reviewCard(it)
-                }
-            )
-        }
-    }
-}
-
-@Composable
-fun HashTagFilteringBar(
-    hashTags: List<HashTagItem>,
-    lazyListState : LazyListState,
-    onHashTagClicked: (String) -> Unit,
-    onFilterBtnClicked : () -> Unit
-) {
-
-    Row(
-        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.vertical_margin)),
-    ){
-        LazyRow(
-            modifier = Modifier.weight(1f),
-            state = lazyListState
-        ){
-            itemsIndexed(hashTags){ index, hashTag->
-                hashTagChip(
-                    hashTag = hashTag.value,
-                    isSelected = hashTag.isSelected,
-                    onHashTagClicked = onHashTagClicked
+        Crossfade(
+            targetState = uiState.isLoading,
+            modifier = Modifier.weight(1f)
+        ) { isLoading ->
+            if(isLoading){
+                CenterCircularProgressIndicator()
+            }else if (uiState.cards.cards.isEmpty()){
+                NoCardScreen()
+            }else {
+                CardFeedContent(
+                    cards = uiState.cards,
+                    currentFilteringLabel = R.string.app_name,
+                    onCardClick = onCardClick,
+                    onCardEditClick = onCardEditClick,
+                    onCardReviewed = {
+                        viewModel.reviewCard(it)
+                    }
                 )
             }
         }
-//        IconButton( modifier = Modifier,
-//            onClick = onFilterBtnClicked
-//        ){
-//            Icon(
-//                painter = painterResource(id = R.drawable.baseline_filter_list_24),
-//                contentDescription = "filter",
-//                modifier = Modifier.size(24.dp)
-//            )
-//        }
     }
-
-
 }
-@OptIn(ExperimentalMaterialApi::class)
+
 @Composable
-fun hashTagChip(
-    hashTag: String,
-    isSelected : Boolean,
-    onHashTagClicked : (String) -> Unit
+fun CardFeedContent(
+//    loading: Boolean,
+    cards: Cards<MyCard>,
+    @StringRes currentFilteringLabel: Int,
+    onCardClick: (Long) -> Unit,
+    onCardEditClick : (Long) -> Unit,
+    onCardReviewed: (Long) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val chipColor = colorResource(id = R.color.quickThink_blue)
-    Chip(
-        onClick = {onHashTagClicked(hashTag)},
-        modifier = Modifier.padding(horizontal = 4.dp),
-        shape = RoundedCornerShape(dimensionResource(id = R.dimen.chip_roundedCorner)),
-        colors = ChipDefaults.chipColors(
-            backgroundColor = if(isSelected) chipColor else chipColor.copy(0.3f)
-        )
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+//            .padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin))
     ) {
-       Text(text = "#$hashTag")
+        LazyColumn {
+            itemsIndexed(cards.cards) { index, card ->
+                CardItem(
+                    card = card,
+                    onCardClick = onCardClick,
+                    onCardEditClick = onCardEditClick,
+                    onCardReviewed = onCardReviewed
+                )
+            }
+        }
     }
 }
+
+
+@Composable
+fun CardItem(
+    card: MyCard,
+    onCardClick: (Long) -> Unit,
+    onCardReviewed: (Long) -> Unit,
+    onCardEditClick: (Long) -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.Start,
+        modifier = Modifier
+            .padding(
+                horizontal = dimensionResource(id = R.dimen.horizontal_margin),
+                vertical = dimensionResource(id = R.dimen.list_item_padding),
+            )
+            .clip(RoundedCornerShape(10.dp))
+            .border(
+                border = BorderStroke(2.dp, SolidColor(Color.Black)),
+                shape = RoundedCornerShape(10.dp)
+            )
+            .fillMaxWidth()
+            .clickable { onCardClick(card.id) }
+    ) {
+        CardItemHeader(
+            card = card,
+            onCardReviewed = onCardReviewed,
+            onCardEditClick = onCardEditClick
+        )
+        Divider(color = Color.Black,thickness = 2.dp)
+        CardBox(content = card.content)
+        hashTagFlowRow(card.hashTags)
+    }
+}
+@Preview
+@Composable
+fun CardContentPreview() {
+    Surface {
+        CardFeedContent(
+            cards = dummyMyCards,
+            currentFilteringLabel = R.string.app_name,
+            onCardClick = {},
+            onCardEditClick = {},
+            onCardReviewed = { _ -> }
+        )
+    }
+}
+
 
 @Preview
 @Composable
-fun HashTagFilterBarPrev() {
-    Surface() {
-        val hashTagListState = rememberLazyListState()
-        HashTagFilteringBar(
-            hashTags = listOf(HashTagItem("테스트",false))+ List(20){HashTagItem("테스트$it",true)},
-            hashTagListState,
-            onHashTagClicked = {},
-            onFilterBtnClicked = {}
+fun CardItemPreview() {
+    Surface {
+        CardItem(
+            card = dummyMyCard,
+            onCardEditClick = {},
+            onCardClick = {},
+            onCardReviewed = {}
         )
     }
 
