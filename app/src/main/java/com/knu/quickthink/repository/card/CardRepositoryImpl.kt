@@ -21,10 +21,16 @@ class CardRepositoryImpl @Inject constructor(
     override suspend fun fetchMyCard(cardId: Long): NetworkResult<MyCard> {
         return remoteDataSource.fetchMyCard(cardId)
     }
+    override suspend fun fetchOthersCard(cardId: Long): NetworkResult<OthersCard> {
+        return remoteDataSource.fetchOthersCard(cardId)
+    }
 
     override suspend fun fetchMyCards(hashTags: HashTags): NetworkResult<Cards<MyCard>> {
         val user = userManager.userState.first()
         return  remoteDataSource.fetchMyCards(user.googleId,hashTags)
+    }
+    override suspend fun fetchOthersCards(googleId: String, hashTags: HashTags): NetworkResult<Cards<OthersCard>> {
+        return remoteDataSource.fetchOthersCards(googleId,hashTags)
     }
 
     override suspend fun fetchHashTags(googleId : String?): NetworkResult<HashTags> {
@@ -46,11 +52,4 @@ class CardRepositoryImpl @Inject constructor(
         return remoteDataSource.reviewCard(cardId)
     }
 
-    override suspend fun fetchOthersCard(cardId: Long): NetworkResult<OthersCard> {
-        return remoteDataSource.fetchOthersCard(cardId)
-    }
-
-    override suspend fun fetchOthersCards(hashTags: HashTags): NetworkResult<Cards<OthersCard>> {
-        return remoteDataSource.fetchOthersCards(hashTags)
-    }
 }

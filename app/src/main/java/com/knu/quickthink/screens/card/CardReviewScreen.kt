@@ -162,7 +162,7 @@ fun CardReview(
                 card.hashTags.forEach { hashTag ->
                     Text(
                         text = "#$hashTag",
-                        color = Color.Blue.copy(alpha = 0.8f),
+                        color = colorResource(id = R.color.quickThink_blue),
                         fontSize = 16.sp
                     )
                 }
@@ -197,7 +197,9 @@ fun CardReview(
 @Preview(showBackground = true,widthDp = 400, heightDp = 600, )
 @Composable
 fun CardReviewPrev() {
-    Surface(modifier = Modifier.padding(10.dp).clip(RoundedCornerShape(20.dp))) {
+    Surface(modifier = Modifier
+        .padding(10.dp)
+        .clip(RoundedCornerShape(20.dp))) {
         CardReview(
             card = dummyMyCard,
             onEditClicked = { /*TODO*/ },

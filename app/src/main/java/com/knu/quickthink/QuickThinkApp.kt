@@ -28,6 +28,7 @@ import com.google.accompanist.navigation.material.bottomSheet
 import com.knu.quickthink.components.FABContent
 import com.knu.quickthink.screens.account.AccountScreen
 import com.knu.quickthink.screens.card.CardEditScreen
+import com.knu.quickthink.screens.feed.OthersFeedScreen
 import com.knu.quickthink.screens.login.LoginScreen
 import timber.log.Timber
 
@@ -127,6 +128,13 @@ fun QuickThinkApp(
                                 }
                             )
                         }
+                        composable(
+                            route = "${MainDestination.OTHERS_FEED_ROUTE}/{id}",
+                            arguments = listOf(navArgument("id"){ type= NavType.StringType }),
+                        ) {
+                            val othersGoogleId = it.arguments?.getString("id") ?:""
+                            OthersFeedScreen(othersGoogleId = othersGoogleId)
+                        }
                         dialog(
                             route = MainDestination.ACCOUNT_ROUTE,
                             dialogProperties = DialogProperties(usePlatformDefaultWidth = false)
@@ -154,8 +162,7 @@ fun QuickThinkApp(
                                 Box(modifier = Modifier.height(with(LocalDensity.current) { sheetHeight.toDp() })) {
                                     UserSearchScreen(
                                         navigateToUserFeedScreen = {
-                                            /* TODO : User Feed Screen으로 이동*/
-                                            appState.navController.navigate(MainDestination.FEED_ROUTE)
+                                            appState.navController.navigate("${MainDestination.OTHERS_FEED_ROUTE}/$it")
                                         },
                                         onCloseClicked = {
                                             appState.navController.popBackStack()

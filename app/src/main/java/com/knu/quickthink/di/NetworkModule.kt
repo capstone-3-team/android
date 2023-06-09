@@ -1,7 +1,6 @@
 package com.knu.quickthink.di
 
-import com.knu.quickthink.network.apiService.MyCardApiService
-import com.knu.quickthink.network.apiService.OthersCardApiService
+import com.knu.quickthink.network.apiService.CardApiService
 import com.knu.quickthink.network.apiService.UserApiService
 import com.knu.quickthink.repository.card.CardRepository
 import com.knu.quickthink.repository.card.CardRepositoryImpl
@@ -26,14 +25,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideMyCardApiService(retrofit: Retrofit): MyCardApiService {
-        return retrofit.create(MyCardApiService::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun provideOthersCardApiService(retrofit: Retrofit): OthersCardApiService {
-        return retrofit.create(OthersCardApiService::class.java)
+    fun provideCardApiService(retrofit: Retrofit): CardApiService {
+        return retrofit.create(CardApiService::class.java)
     }
 
 }

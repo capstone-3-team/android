@@ -4,42 +4,39 @@ import com.knu.quickthink.model.NetworkResult
 import com.knu.quickthink.model.card.*
 import com.knu.quickthink.model.card.mycard.MyCard
 import com.knu.quickthink.model.card.otherscard.OthersCard
-import com.knu.quickthink.network.apiService.MyCardApiService
-import com.knu.quickthink.network.apiService.OthersCardApiService
+import com.knu.quickthink.network.apiService.CardApiService
 import javax.inject.Inject
 
 class CardRemoteDataSource @Inject constructor(
-    private val myCardApiService: MyCardApiService,
-    private val othersCardApiService: OthersCardApiService
+    private val cardApiService: CardApiService,
 ) {
     suspend fun createCard(createCardRequest: CreateCardRequest) : NetworkResult<CreateCardResponse>
-        = myCardApiService.createCard(createCardRequest)
+        = cardApiService.createCard(createCardRequest)
 
     suspend fun fetchMyCard(cardId : Long) : NetworkResult<MyCard>
-        = myCardApiService.fetchMyCard(cardId)
+        = cardApiService.fetchMyCard(cardId)
+    suspend fun fetchOthersCard(cardId: Long) : NetworkResult<OthersCard>
+        = cardApiService.fetchOthersCard(cardId)
 
     suspend fun fetchMyCards(googleId : String, hashTags: HashTags) : NetworkResult<Cards<MyCard>>
-        = myCardApiService.fetchMyCards(googleId,hashTags)
+        = cardApiService.fetchMyCards(googleId,hashTags)
+    suspend fun fetchOthersCards(googleId : String, hashTags: HashTags) :NetworkResult<Cards<OthersCard>>
+        = cardApiService.fetchOthersCards(googleId,hashTags)
 
     suspend fun fetchHashTags(googleId: String): NetworkResult<HashTags>
-        = myCardApiService.fetchHashTags(googleId)
+        = cardApiService.fetchHashTags(googleId)
 
 
     suspend fun updateCard(
         cardId : Long,
         updateCardRequest: UpdateCardRequest
-    ): NetworkResult<String> = myCardApiService.updateCard(cardId,updateCardRequest)
+    ): NetworkResult<String> = cardApiService.updateCard(cardId,updateCardRequest)
 
     suspend fun deleteCard(cardId: Long) : NetworkResult<String>
-        = myCardApiService.deleteCard(cardId)
+        = cardApiService.deleteCard(cardId)
 
     suspend fun reviewCard(cardId : Long) : NetworkResult<String>
-        = myCardApiService.reviewCard(cardId)
+        = cardApiService.reviewCard(cardId)
 
-    suspend fun fetchOthersCard(cardId: Long) : NetworkResult<OthersCard>
-        = othersCardApiService.fetchOthersCard(cardId)
-
-    suspend fun fetchOthersCards(hashTags: HashTags) :NetworkResult<Cards<OthersCard>>
-        = othersCardApiService.fetchOthersCards(hashTags.hashTags)
 
 }
