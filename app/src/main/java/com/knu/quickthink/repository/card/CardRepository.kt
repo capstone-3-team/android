@@ -13,6 +13,8 @@ interface CardRepository {
 
     suspend fun fetchMyCards(hashTags: HashTags) : NetworkResult<Cards<MyCard>>
 
+    suspend fun fetchHashTags(googleId:String?) : NetworkResult<HashTags>
+
     suspend fun updateCard( cardId : Long, updateCardRequest: UpdateCardRequest): NetworkResult<String>
 
     suspend fun deleteCard(cardId: Long) : NetworkResult<String>

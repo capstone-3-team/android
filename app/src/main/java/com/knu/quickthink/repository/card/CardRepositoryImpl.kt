@@ -1,15 +1,11 @@
 package com.knu.quickthink.repository.card
 
-import androidx.compose.runtime.collectAsState
 import com.knu.quickthink.data.CardRemoteDataSource
-import com.knu.quickthink.data.UserTokenDataStore
 import com.knu.quickthink.model.NetworkResult
 import com.knu.quickthink.model.card.*
 import com.knu.quickthink.model.card.mycard.MyCard
 import com.knu.quickthink.model.card.otherscard.OthersCard
 import com.knu.quickthink.network.UserManager
-import com.knu.quickthink.repository.user.UserRepository
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -31,6 +27,10 @@ class CardRepositoryImpl @Inject constructor(
         return  remoteDataSource.fetchMyCards(user.googleId,hashTags)
     }
 
+    override suspend fun fetchHashTags(googleId : String?): NetworkResult<HashTags> {
+        val user = userManager.userState.first()
+        return   remoteDataSource.fetchHashTags(googleId ?:user.googleId)
+    }
     override suspend fun updateCard(
         cardId: Long,
         updateCardRequest: UpdateCardRequest
