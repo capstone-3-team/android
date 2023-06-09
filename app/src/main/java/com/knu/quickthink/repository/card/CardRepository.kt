@@ -10,8 +10,10 @@ interface CardRepository {
     suspend fun createCard(createCardRequest: CreateCardRequest) : NetworkResult<CreateCardResponse>
 
     suspend fun fetchMyCard(cardId : Long) : NetworkResult<MyCard>
+    suspend fun fetchOthersCard(cardId: Long) : NetworkResult<OthersCard>
 
     suspend fun fetchMyCards(hashTags: HashTags) : NetworkResult<Cards<MyCard>>
+    suspend fun fetchOthersCards(googleId: String, hashTags: HashTags) :NetworkResult<Cards<OthersCard>>
 
     suspend fun fetchHashTags(googleId:String?) : NetworkResult<HashTags>
 
@@ -21,7 +23,4 @@ interface CardRepository {
 
     suspend fun reviewCard(cardId : Long) : NetworkResult<String>
 
-    suspend fun fetchOthersCard(cardId: Long) : NetworkResult<OthersCard>
-
-    suspend fun fetchOthersCards(hashTags: HashTags) :NetworkResult<Cards<OthersCard>>
 }

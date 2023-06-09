@@ -1,6 +1,7 @@
 package com.knu.quickthink.model.card.otherscard
 
 import com.knu.quickthink.model.card.Card
+import com.knu.quickthink.model.card.Cards
 import com.knu.quickthink.model.card.mycard.MyCard
 import java.time.LocalDateTime
 
@@ -12,6 +13,12 @@ data class OthersCard(
     val hashTags : HashSet<String>,
     val writtenDate : String,
     val googleId : String
+)
+
+val emptyOthersCards = Cards<OthersCard>(
+    size = 0 ,
+    isYours = false,
+    cards = emptyList()
 )
 val dummyOthersCard = OthersCard(
     id = 123,
