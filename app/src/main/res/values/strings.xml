@@ -1,8 +1,5 @@
 <resources>
     <string name="app_name">QuickThink</string>
-    <string name="gcp_android_client_id">260274388734-tbq13bf5bh8743r3v7voaa378gk03d7a.apps.googleusercontent.com</string>
-    <string name="gcp_web_client_id">260274388734-84ie3hh2u7kvpmu6qbenl1j7fp2mhtu8.apps.googleusercontent.com</string>
-
     <string name="default_card_content">카드 내용을 입력해주세요</string>
 
 </resources>

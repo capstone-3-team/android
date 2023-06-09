@@ -4,6 +4,8 @@ import android.content.Context
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.knu.quickthink.BuildConfig.GCP_WEB_CLIENT_ID
+import com.knu.quickthink.BuildConfig.QUICKTHINK_BASE_URL
 import com.knu.quickthink.R
 import com.knu.quickthink.network.AuthInterceptor
 import com.knu.quickthink.network.UserManager
@@ -30,12 +32,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object Module{
-    private const val BASE_URL = "https://api.quickthink.online"
     @Singleton
     @Provides
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(QUICKTHINK_BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(NullOnEmptyConverterFactory)
             .addConverterFactory(GsonConverterFactory.create())
@@ -72,8 +73,8 @@ object Module{
     @Singleton
     fun provideGoogleSignInClient(@ApplicationContext context : Context) : GoogleSignInClient{
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestServerAuthCode(context.getString(R.string.gcp_web_client_id))
-            .requestIdToken(context.getString(R.string.gcp_web_client_id))                                  // 이거 받아야지만 프로필 이미지 넘어온다
+            .requestServerAuthCode(GCP_WEB_CLIENT_ID)
+            .requestIdToken(GCP_WEB_CLIENT_ID)                                  // 이거 받아야지만 프로필 이미지 넘어온다
             .build()
         return GoogleSignIn.getClient(context, gso)
     }
