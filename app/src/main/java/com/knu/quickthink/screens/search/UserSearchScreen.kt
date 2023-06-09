@@ -1,5 +1,6 @@
 package com.knu.quickthink.screens.main
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,7 +11,6 @@ import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SearchBar
@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
@@ -41,8 +42,24 @@ import com.knu.quickthink.screens.search.UserSearchViewModel
 fun UserSearchScreen(
     viewModel: UserSearchViewModel = hiltViewModel(),
     onCloseClicked: () -> Unit,
+    navigateToUserFeedScreen : (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(uiState.isSearchSuccess, uiState.message){
+        if(uiState.isSearchSuccess)
+            if(uiState.searchUserId.isNotEmpty()){
+                navigateToUserFeedScreen(uiState.searchUserId)
+            }
+            else{
+                Toast.makeText(context,"해당 유저의 ID를 찾을 수 없습니다",Toast.LENGTH_SHORT).show()
+            }
+        if(uiState.message.isNotEmpty()){
+            Toast.makeText(context,uiState.message,Toast.LENGTH_SHORT).show()
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -50,16 +67,58 @@ fun UserSearchScreen(
     ) {
         BottomSheetHeader(onCloseClicked = onCloseClicked)
         UserSearchBar(
-            users = uiState.users,
-            onQueryChange = { viewModel.searchUser(it)},
+            onQueryChange = { viewModel.searchUsers(it)},
         )
+        UserSearchResults(
+            users = uiState.users,
+            onUserClicked = {
+                viewModel.searchUser(it)
+            }
+        )
+    }
+}
+
+@Composable
+fun UserSearchResults(
+    users : List<UserInfo>,
+    onUserClicked : (UserInfo) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.vertical_margin))
+    ){
+        itemsIndexed(users) { index, user ->
+            Row(
+                modifier = Modifier
+                    .padding(dimensionResource(id = R.dimen.vertical_margin))
+                    .clickable { onUserClicked(user) },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                profileImage(
+                    imageUrl = user.profilePicture,
+                    imageSize = dimensionResource(id = R.dimen.userProfile_image),
+                )
+                Text(
+                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin)),
+                    text = user.googleName,
+                    fontSize = 18.sp
+                )
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin))
+                        .weight(1f),
+                    text = user.profileText ?: "",
+                    fontSize = 15.sp,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.End
+                )
+            }
+        }
     }
 }
 
 @ExperimentalMaterial3Api
 @Composable
 fun UserSearchBar(
-    users : List<UserInfo>,
     onQueryChange: (String) -> Unit,
 ) {
     var query by remember { mutableStateOf("") }
@@ -78,7 +137,7 @@ fun UserSearchBar(
                 query = it
                 onQueryChange(it)
             },
-            onSearch = {},
+            onSearch = onQueryChange,
             active = false,
             onActiveChange = { },
             placeholder = {
@@ -108,34 +167,6 @@ fun UserSearchBar(
             )
 
         ) {}
-    }
-    LazyColumn(
-        modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.vertical_margin))
-    ){
-        itemsIndexed(users) { index, user ->
-            Row(
-                modifier = Modifier.padding(dimensionResource(id = R.dimen.vertical_margin)),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                profileImage(
-                    imageUrl = user.profilePicture,
-                    imageSize = dimensionResource(id = R.dimen.userProfile_image),
-                )
-                Text(
-                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin)),
-                    text = user.googleName,
-                    fontSize = 18.sp
-                )
-                Text(
-                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin))
-                        .weight(1f),
-                    text = user.profileText ?: "",
-                    fontSize = 15.sp,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.End
-                )
-            }
-        }
     }
 }
 
@@ -176,7 +207,8 @@ fun BottomSheetHeader(
 fun SearchScreenPrev() {
     Surface {
         UserSearchScreen(
-            onCloseClicked = { }
+            onCloseClicked = { },
+            navigateToUserFeedScreen = {}
         )
     }
 }
@@ -187,7 +219,6 @@ fun SearchScreenPrev() {
 fun UserSearchBarPrev() {
     Surface {
         UserSearchBar(
-            users = testUserList.userList,
             onQueryChange = {})
     }
 }

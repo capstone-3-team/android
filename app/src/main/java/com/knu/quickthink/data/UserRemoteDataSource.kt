@@ -31,7 +31,11 @@ class UserRemoteDataSource @Inject constructor (
     suspend fun updateToken(token: String, googleId: String): NetworkResult<String> {
         return userApiService.updateToken(token,googleId)
     }
-    suspend fun searchUser(searchName: String): NetworkResult<UserListResponse> {
-        return userApiService.searchUser(searchName)
+    suspend fun searchUsers(searchName: String): NetworkResult<UserListResponse> {
+        return userApiService.searchUsers(searchName)
+    }
+
+    suspend fun searchUser(googleId: String): NetworkResult<UserInfo> {
+        return userApiService.searchUser(googleId)
     }
 }

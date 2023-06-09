@@ -45,9 +45,13 @@ interface UserApiService {
         @Body text: String
     ) : NetworkResult<String>
     @GET("/api/search")
-    suspend fun searchUser(
+    suspend fun searchUsers(
         @Query("searchName") searchName: String
     ): NetworkResult<UserListResponse>
 
+    @GET("/api/person")
+    suspend fun searchUser(
+        @Query("googleId") googleId : String
+    ) : NetworkResult<UserInfo>
 
 }

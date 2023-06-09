@@ -1,7 +1,5 @@
 package com.knu.quickthink.repository.user
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.common.api.ApiException
@@ -16,9 +14,6 @@ import com.knu.quickthink.model.user.UserListResponse
 import com.knu.quickthink.network.RetrofitFailureStateException
 import com.knu.quickthink.network.UserManager
 import com.knu.quickthink.screens.search.UserInfo
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
@@ -89,8 +84,11 @@ class UserRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun searchUser(searchName: String): NetworkResult<UserListResponse> =
-        remoteDataSource.searchUser(searchName)
+    override suspend fun searchUsers(searchName: String): NetworkResult<UserListResponse> =
+        remoteDataSource.searchUsers(searchName)
+
+    override suspend fun searchUser(googleId: String): NetworkResult<UserInfo>  =
+        remoteDataSource.searchUser(googleId)
 
     override suspend fun autoLogin(): Boolean {
         var isLoggedIn = true
