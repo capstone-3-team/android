@@ -154,7 +154,7 @@ fun QuickThinkApp(
                                 }
                         }
                         composable(route = MainDestination.CHATGPT_ROUTE) {
-                            ChatGPTScreen()
+                            ChatGptScreen()
                         }
                         bottomSheet(route = MainDestination.SERACH_ROUTE) {
                             BoxWithConstraints() {
