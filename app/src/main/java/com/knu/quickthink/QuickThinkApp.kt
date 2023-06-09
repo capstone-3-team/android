@@ -152,7 +152,15 @@ fun QuickThinkApp(
                             BoxWithConstraints() {
                                 val sheetHeight = this.constraints.maxHeight * 0.8f
                                 Box(modifier = Modifier.height(with(LocalDensity.current) { sheetHeight.toDp() })) {
-                                    SearchScreen()
+                                    UserSearchScreen(
+                                        navigateToUserFeedScreen = {
+                                            /* TODO : User Feed Screen으로 이동*/
+                                            appState.navController.navigate(MainDestination.FEED_ROUTE)
+                                        },
+                                        onCloseClicked = {
+                                            appState.navController.popBackStack()
+                                        }
+                                    )
                                 }
                             }
                         }

@@ -3,7 +3,8 @@ package com.knu.quickthink.repository.user
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.knu.quickthink.model.user.IntroductionResponse
 import com.knu.quickthink.model.NetworkResult
-import kotlinx.coroutines.flow.StateFlow
+import com.knu.quickthink.model.user.UserListResponse
+import com.knu.quickthink.screens.search.UserInfo
 
 interface UserRepository {
     suspend fun login(gsa :GoogleSignInAccount): Result<String>
@@ -13,4 +14,8 @@ interface UserRepository {
 
     suspend fun fetchIntroduction() : NetworkResult<IntroductionResponse>
     suspend fun updateIntroduction(introduction : String) :NetworkResult<String>
+
+    suspend fun searchUsers(searchName : String) : NetworkResult<UserListResponse>
+    suspend fun searchUser(googleId : String) : NetworkResult<UserInfo>
+
 }

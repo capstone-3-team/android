@@ -1,7 +1,5 @@
 package com.knu.quickthink.repository.user
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.common.api.ApiException
@@ -12,18 +10,17 @@ import com.knu.quickthink.data.UserTokenDataStore
 import com.knu.quickthink.model.*
 import com.knu.quickthink.model.user.GoogleUserModel
 import com.knu.quickthink.model.user.IntroductionResponse
+import com.knu.quickthink.model.user.UserListResponse
 import com.knu.quickthink.network.RetrofitFailureStateException
 import com.knu.quickthink.network.UserManager
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.knu.quickthink.screens.search.UserInfo
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import javax.inject.Inject
 
 const val DEFAULT_PROFILE_IMAGE =
-    "https://img.freepik.com/premium-vector/account-icon-user-icon-vector-graphics_292645-552.jpg?w=996"
+    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
 
 data class User(
     val token :String = "",
@@ -86,6 +83,12 @@ class UserRepositoryImpl @Inject constructor(
             introduction
         )
     }
+
+    override suspend fun searchUsers(searchName: String): NetworkResult<UserListResponse> =
+        remoteDataSource.searchUsers(searchName)
+
+    override suspend fun searchUser(googleId: String): NetworkResult<UserInfo>  =
+        remoteDataSource.searchUser(googleId)
 
     override suspend fun autoLogin(): Boolean {
         var isLoggedIn = true

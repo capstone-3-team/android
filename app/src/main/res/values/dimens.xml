@@ -21,7 +21,8 @@
 
     <dimen name="fab_margin">16dp</dimen>
 
-    <dimen name="profile_image">40dp</dimen>
+    <dimen name="myProfile_image">40dp</dimen>
+    <dimen name="userProfile_image">32dp</dimen>
     <dimen name="dialog_roundedCorner">10dp</dimen>
     <dimen name="chip_roundedCorner">5dp</dimen>
     <dimen name="list_item_padding">8dp</dimen>
