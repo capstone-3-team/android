@@ -45,7 +45,7 @@ fun CardFeedContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin))
+//            .padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin))
     ) {
 //        Text(
 //            text = stringResource(currentFilteringLabel),
