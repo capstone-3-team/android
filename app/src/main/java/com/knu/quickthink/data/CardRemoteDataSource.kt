@@ -21,6 +21,10 @@ class CardRemoteDataSource @Inject constructor(
     suspend fun fetchMyCards(googleId : String, hashTags: HashTags) : NetworkResult<Cards<MyCard>>
         = myCardApiService.fetchMyCards(googleId,hashTags)
 
+    suspend fun fetchHashTags(googleId: String): NetworkResult<HashTags>
+        = myCardApiService.fetchHashTags(googleId)
+
+
     suspend fun updateCard(
         cardId : Long,
         updateCardRequest: UpdateCardRequest
@@ -37,4 +41,5 @@ class CardRemoteDataSource @Inject constructor(
 
     suspend fun fetchOthersCards(hashTags: HashTags) :NetworkResult<Cards<OthersCard>>
         = othersCardApiService.fetchOthersCards(hashTags.hashTags)
+
 }

@@ -4,7 +4,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.knu.quickthink.model.card.CreateCardRequest
-import com.knu.quickthink.model.card.HashTags
 import com.knu.quickthink.model.card.UpdateCardRequest
 import com.knu.quickthink.model.card.mycard.MyCard
 import com.knu.quickthink.model.card.mycard.emptyMyCard

@@ -23,6 +23,12 @@ interface MyCardApiService {
         @Body hashTags : HashTags
     ) : NetworkResult<Cards<MyCard>>
 
+    @GET("/api/hashtags")
+    suspend fun fetchHashTags(
+        @Query("googleId") googleId : String,
+    ) :NetworkResult<HashTags>
+
+
     @PUT("api/card/edit")
     suspend fun updateCard(
         @Query("cardId") cardId : Long,

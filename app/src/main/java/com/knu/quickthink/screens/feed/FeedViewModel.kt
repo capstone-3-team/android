@@ -2,16 +2,11 @@ package com.knu.quickthink.screens.feed
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.knu.quickthink.model.card.Card
-import com.knu.quickthink.model.card.Cards
-import com.knu.quickthink.model.card.HashTags
-import com.knu.quickthink.model.card.emptyMyCards
+import com.knu.quickthink.model.card.*
 import com.knu.quickthink.model.card.mycard.MyCard
-import com.knu.quickthink.model.converter.convertMyCardsDate
 import com.knu.quickthink.model.onErrorOrException
 import com.knu.quickthink.model.onSuccess
 import com.knu.quickthink.repository.card.CardRepository
-import com.knu.quickthink.utils.convertDateFormat
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +19,7 @@ import javax.inject.Inject
 data class FeedUiState(
     val isLoading : Boolean = false,
     val cards : Cards<MyCard> = emptyMyCards,
-    val hashTags: HashTags = HashTags(emptyList()),
+    val hashTags: HashMap<String, Boolean> = HashMap(),
     val message : String = ""
 )
 
@@ -37,26 +32,53 @@ class FeedViewModel @Inject constructor(
     val uiState :StateFlow<FeedUiState> = _uiState.asStateFlow()
 
     init {
+        fetchHashTags()
         fetchMyCards()
+    }
+
+    private fun fetchHashTags() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            cardRepository.fetchHashTags(null)
+                .onSuccess {hashTags ->
+                    _uiState.update { state ->
+                        state.copy(hashTags = HashMap<String, Boolean>().apply {
+                            hashTags.hashTags.forEach { put(it,false)}
+                        })
+                    }
+                }
+                .onErrorOrException { code, message ->
+                    Timber.d("code : $code  message : $message")
+                }
+        }
     }
 
     fun fetchMyCards(){
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            cardRepository.fetchMyCards(_uiState.value.hashTags)
-                .onSuccess {
-                    _uiState.update { state ->
-                        state.copy(cards = it, isLoading = false)
-                    }
-                }.onErrorOrException{ code, message ->
-                    Timber.d("code : $code  message : $message")
-                    _uiState.update { state ->
-                        state.copy(cards = emptyMyCards, isLoading = false, message = message ?: "알 수 없는 오류")
-                    }
+            cardRepository.fetchMyCards(
+                hashTags = HashTags(_uiState.value.hashTags.filterValues { it }.keys.toList())
+            ).onSuccess {
+                _uiState.update { state ->
+                    state.copy(cards = it, isLoading = false)
                 }
+            }.onErrorOrException{ code, message ->
+                Timber.d("code : $code  message : $message")
+                _uiState.update { state ->
+                    state.copy(cards = emptyMyCards, isLoading = false, message = message ?: "알 수 없는 오류")
+                }
+            }
         }
     }
 
+    fun hashTagSelect(hashTag : String){
+        val updateHashTags = HashMap(uiState.value.hashTags)
+        updateHashTags[hashTag] = !updateHashTags[hashTag]!!
+        _uiState.update { state ->
+            state.copy(hashTags = updateHashTags)
+        }
+        fetchMyCards()
+    }
     fun reviewCard(cardId : Long) {
 
     }
