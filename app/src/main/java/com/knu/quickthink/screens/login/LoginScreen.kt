@@ -2,6 +2,7 @@ package com.knu.quickthink.screens.login
 
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -12,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.common.api.ApiException
 import com.knu.quickthink.R
+import com.knu.quickthink.components.CenterCircularProgressIndicator
 import com.knu.quickthink.components.GoogleLoginButton
 import com.knu.quickthink.components.Logo
 import com.knu.quickthink.components.LottieImage
@@ -56,30 +58,24 @@ fun LoginScreen(
             }
         }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        if(isLoading){
-            Timber.tag("isLoading").d("true")
-//            CircularProgressIndicator()
-            LottieImage(rawRes = R.raw.welcome, modifier = Modifier)
-        }else {
-            Logo()
-            Spacer(modifier = Modifier.height(70.dp))
-//            Box(
-//                modifier = Modifier.height(70.dp),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                Text(
-//                    text = "서비스 사용을 위해 구글 로그인을 해주세요",
-//                    style = MaterialTheme.typography.h5
-//                )
-//            }
-            GoogleLoginButton(onLoginClicked = {
-                authResultLauncher.launch(signInRequestCode)
-            })
+
+    Crossfade(targetState = isLoading) {isLoading->
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if(isLoading){
+                Timber.tag("isLoading").d("true")
+    //                CenterCircularProgressIndicator()
+                LottieImage(rawRes = R.raw.welcome, modifier = Modifier)
+            }else {
+                Logo()
+                Spacer(modifier = Modifier.height(70.dp))
+                GoogleLoginButton(onLoginClicked = {
+                    authResultLauncher.launch(signInRequestCode)
+                })
+            }
         }
     }
 }

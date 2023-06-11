@@ -19,36 +19,36 @@ import timber.log.Timber
 @Composable
 fun rememberQuickThinkAppState(
     navController: NavHostController = rememberNavController(),
-    sheetState : ModalBottomSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = true,
-        confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded }
-    ),
-    feedScreenState : FeedScreenState = rememberFeedScreenState(),
-    bottomSheetNavigator :BottomSheetNavigator = remember{
-        BottomSheetNavigator(sheetState)
-    },
+    mainScreenState: MainScreenState = rememberMainScreenState(),
     coroutineScope :CoroutineScope = rememberCoroutineScope(),
-    isMainRoute : MutableState<Boolean> = remember { mutableStateOf(false)},
-    isFeedRoute : MutableState<Boolean> = remember { mutableStateOf(false)},
-    menuExpanded : MutableState<Boolean> = remember { mutableStateOf(false)},
-) = remember(navController,bottomSheetNavigator,coroutineScope,sheetState,feedScreenState,isMainRoute,menuExpanded){
-    QuickThinkAppState(navController,bottomSheetNavigator,coroutineScope,sheetState,feedScreenState,isMainRoute,isFeedRoute,menuExpanded)
+
+) = remember(navController,mainScreenState,coroutineScope){
+    QuickThinkAppState(navController,mainScreenState,coroutineScope)
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialNavigationApi::class)
 class QuickThinkAppState(
     val navController: NavHostController,
-    val bottomSheetNavigator :BottomSheetNavigator,
+    val mainScreenState: MainScreenState,
     val coroutineScope :CoroutineScope,
-    val sheetState : ModalBottomSheetState,
-    val feedScreenState : FeedScreenState,
-    val isMainRoute : MutableState<Boolean>,
-    val isFeedRoute : MutableState<Boolean>,
-    val menuExpanded : MutableState<Boolean>,
 ) {
+    val currentRoute: String?
+        @Composable get() = navController.currentBackStackEntryAsState().value?.destination?.route
+
+    val isMyFeedScreen : Boolean
+        @Composable get() = navController.currentBackStackEntryAsState().value?.destination?.route == MainDestination.FEED_ROUTE
+}
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialNavigationApi::class)
+class MainScreenState(
+    val navController: NavHostController,
+    val feedScreenState: FeedScreenState,
+    val sheetState: ModalBottomSheetState,
+    val bottomSheetNavigator: BottomSheetNavigator
+){
     fun addDestinationChangedListener(
     ){
+        val isMainRoute = feedScreenState.isMainRoute
+        val isFeedRoute = feedScreenState.isFeedRoute
         val callback = NavController.OnDestinationChangedListener { _, destination, _ ->
             if(!isMainRoute.value && destination.route!!.contains("main")) {
                 isMainRoute.value = true
@@ -60,24 +60,40 @@ class QuickThinkAppState(
         }
         navController.addOnDestinationChangedListener(callback)
     }
-
-    val currentRoute: String?
-        @Composable get() = navController.currentBackStackEntryAsState().value?.destination?.route
-
-    val isMyFeedScreen : Boolean
-        @Composable get() = navController.currentBackStackEntryAsState().value?.destination?.route == MainDestination.FEED_ROUTE
 }
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialNavigationApi::class)
+@Composable
+fun rememberMainScreenState(
+    navController: NavHostController = rememberNavController(),
+    feedScreenState : FeedScreenState = rememberFeedScreenState(),
+    sheetState : ModalBottomSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true,
+        confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded }
+    ),
+    bottomSheetNavigator :BottomSheetNavigator = remember{
+        BottomSheetNavigator(sheetState)
+    },
 
+) = remember(navController,feedScreenState,sheetState,bottomSheetNavigator){
+    MainScreenState(navController,feedScreenState,sheetState,bottomSheetNavigator)
+}
 class FeedScreenState (
     val hashTagListState : LazyListState,
-    val feedListState : LazyListState
+    val feedListState : LazyListState,
+    val isMainRoute: MutableState<Boolean>,
+    val isFeedRoute: MutableState<Boolean>,
+    val menuExpanded : MutableState<Boolean>,
 )
 
 @Composable
 fun rememberFeedScreenState() : FeedScreenState{
     return FeedScreenState(
         hashTagListState = rememberLazyListState(),
-        feedListState = rememberLazyListState()
+        feedListState = rememberLazyListState(),
+        isMainRoute = remember { mutableStateOf(false)},
+        isFeedRoute = remember { mutableStateOf(false)},
+        menuExpanded = remember { mutableStateOf(false)},
     )
 }
 
