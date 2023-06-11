@@ -16,6 +16,6 @@ interface UserRepository {
     suspend fun updateIntroduction(introduction : String) :NetworkResult<String>
 
     suspend fun searchUsers(searchName : String) : NetworkResult<UserListResponse>
-    suspend fun searchUser(googleId : String) : NetworkResult<UserInfo>
+    suspend fun fetchUserInfo(googleId : String?) : NetworkResult<UserInfo>
 
 }

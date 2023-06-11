@@ -16,10 +16,10 @@ import javax.inject.Inject
 
 
 data class UserInfo(
-    val googleName : String,
-    val googleId : String,
-    val profilePicture : String,
-    val profileText : String?
+    val googleName : String = "",
+    val googleId : String = "",
+    val profilePicture : String = "",
+    val profileText : String? = null
 )
 
 
@@ -59,7 +59,7 @@ class UserSearchViewModel @Inject constructor(
     fun searchUser(user: UserInfo){
         _uiState.update { it.copy(searchUserId = user.googleName) }
         viewModelScope.launch {
-            userRepository.searchUser(user.googleId)
+            userRepository.fetchUserInfo(user.googleId)
                 .onSuccess {
                     _uiState.update { it.copy(isSearchSuccess = true, searchUserId = user.googleId) }
                 }.onErrorOrException{ code, message ->

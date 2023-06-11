@@ -26,7 +26,7 @@ class CardRepositoryImpl @Inject constructor(
     }
 
     override suspend fun fetchMyCards(hashTags: HashTags): NetworkResult<Cards<MyCard>> {
-        val user = userManager.userState.first()
+        val user = userManager.userState.value
         return  remoteDataSource.fetchMyCards(user.googleId,hashTags)
     }
     override suspend fun fetchOthersCards(googleId: String, hashTags: HashTags): NetworkResult<Cards<OthersCard>> {
@@ -34,7 +34,7 @@ class CardRepositoryImpl @Inject constructor(
     }
 
     override suspend fun fetchHashTags(googleId : String?): NetworkResult<HashTags> {
-        val user = userManager.userState.first()
+        val user = userManager.userState.value
         return   remoteDataSource.fetchHashTags(googleId ?:user.googleId)
     }
     override suspend fun updateCard(

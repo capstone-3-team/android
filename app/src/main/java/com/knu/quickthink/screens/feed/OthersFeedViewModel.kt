@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.knu.quickthink.model.card.Cards
 import com.knu.quickthink.model.card.HashTags
-import com.knu.quickthink.model.card.emptyMyCards
-import com.knu.quickthink.model.card.mycard.MyCard
 import com.knu.quickthink.model.card.otherscard.OthersCard
 import com.knu.quickthink.model.card.otherscard.emptyOthersCards
 import com.knu.quickthink.model.onErrorOrException
@@ -44,7 +42,7 @@ class OthersFeedViewModel @Inject constructor(
     fun fetchUserInfo(googleId: String){
         _uiState.update { it.copy(othersUserInfo = it.othersUserInfo.copy(googleId = googleId)) }
         viewModelScope.launch {
-            userRepository.searchUser(googleId)
+            userRepository.fetchUserInfo(googleId)
                 .onSuccess {
                     _uiState.update { state ->
                         state.copy(othersUserInfo = it) }
