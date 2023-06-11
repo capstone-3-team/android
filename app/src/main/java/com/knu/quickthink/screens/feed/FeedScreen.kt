@@ -57,7 +57,6 @@ fun FeedScreen(
         viewModel.fetchContent()
     }
 
-
     Timber.d("cards : ${uiState.cards}")
     Column(modifier = Modifier.fillMaxSize()){
         HashTagFilteringBar(

@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 data class FeedUiState(
@@ -52,14 +54,14 @@ class FeedViewModel @Inject constructor(
         }
     }
 
-    fun fetchMyCards(){
+    private fun fetchMyCards(){
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             cardRepository.fetchMyCards(
                 hashTags = HashTags(_uiState.value.hashTags.filterValues { it }.keys.toList())
             ).onSuccess {
                 _uiState.update { state ->
-                    state.copy(cards = it, isLoading = false)
+                    state.copy(cards = sortCardsByLatestReviewDate(it), isLoading = false)
                 }
             }.onErrorOrException{ code, message ->
                 Timber.d("code : $code  message : $message")
@@ -79,6 +81,24 @@ class FeedViewModel @Inject constructor(
         fetchMyCards()
     }
     fun reviewCard(cardId : Long) {
+        viewModelScope.launch {
+            cardRepository.reviewCard(cardId)
+                .onSuccess {
+                    fetchMyCards()
+                }.onErrorOrException { code, message ->
+                    Timber.e("updateCard onError : code $code , message $message")
+                }
+        }
 
+    }
+
+    private fun sortCardsByLatestReviewDate(cards: Cards<MyCard>): Cards<MyCard> {
+        val updatedCards =  cards.cards.toMutableList().sortedBy{ card ->
+            LocalDateTime.parse(card.latestReviewDate, DateTimeFormatter.ISO_DATE_TIME)
+        }
+//        .forEach {
+//            Timber.d("updatedCard  : id: ${it.id} 수정일:${it.latestReviewDate}")
+//        }
+        return cards.copy(cards = updatedCards)
     }
 }
