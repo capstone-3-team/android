@@ -258,7 +258,9 @@ fun CenterCircularProgressIndicator() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        CircularProgressIndicator()
+        CircularProgressIndicator(
+            color = colorResource(id = R.color.quickThink_blue)
+        )
     }
 }
 
