@@ -1,6 +1,7 @@
 package com.knu.quickthink.screens.main
 
 import android.app.Activity
+import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -41,24 +42,41 @@ import androidx.core.view.WindowCompat
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.knu.quickthink.screens.card.CardEditScreen
 import timber.log.Timber
 
 @Composable
 fun ChatGptScreen(
     viewModel: ChatGptViewModel = hiltViewModel(),
     onBackPressed : () -> Unit,
+//    onMessageSaved: (Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    if(uiState.showCardEditDialog){
+        if(uiState.savedCardId != null){
+            CardEditDialog(
+                cardId = uiState.savedCardId!!,
+                onDismissRequest = {
+                    viewModel.updateUiState(uiState.copy(showCardEditDialog = false))
+                    Toast.makeText(context,"카드가 저장되었습니다",Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
+    }
 
     ChatGptContent(
         messages = uiState.messageDataList,
         isMessageEmpty = uiState.messageDataList.isEmpty(),
-        isChatGptTyping = uiState.isLoading,
+        isChatGptTyping = uiState.isChatGptTyping,
         onMessageSent = { message ->
             viewModel.askToGpt(message)
         },
         onMessageSaved = { message ->
-
+            viewModel.saveMessage(message)
         },
         onBackPressed = onBackPressed
     )
@@ -380,6 +398,35 @@ fun ChatGptTopAppBar(
         backgroundColor = colorResource(id = R.color.white),
         elevation = 0.dp,
     )
+}
+
+@Composable
+fun CardEditDialog(
+    cardId : Long,
+    onDismissRequest : () -> Unit,
+) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+            ,decorFitsSystemWindows = false
+        )
+    ) {
+        Surface(
+            modifier = Modifier
+                .width(400.dp)
+                .height(800.dp)
+                .padding(top = 10.dp, start = 10.dp, end = 10.dp)
+                .clip(RoundedCornerShape(20.dp))
+        ) {
+            CardEditScreen(
+                cardId = cardId,
+                onBackClicked = onDismissRequest,
+                onDoneClicked = {}
+            )
+        }
+    }
+
 }
 
 //@Preview(showBackground = true)
