@@ -63,7 +63,8 @@ fun UserSearchScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(dimensionResource(id = R.dimen.vertical_margin))
+            .padding(top = dimensionResource(id = R.dimen.vertical_margin))
+            .padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin) )
     ) {
         BottomSheetHeader(onCloseClicked = onCloseClicked)
         UserSearchBar(
@@ -84,7 +85,7 @@ fun UserSearchResults(
     onUserClicked : (UserInfo) -> Unit
 ) {
     LazyColumn(
-        modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.vertical_margin))
+        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.vertical_margin))
     ){
         itemsIndexed(users) { index, user ->
             Row(
