@@ -89,7 +89,7 @@ fun AccountScreen(
                     onValueChange = viewModel::editIntroduction,
                     placeholder = { Text("자기소개를 입력해주세요") },
                     modifier = Modifier
-                        .height(250.dp)
+                        .weight(1f)
                         .fillMaxWidth()
                         .shadow(elevation = 3.dp)
                         .clip(RoundedCornerShape(10.dp)),

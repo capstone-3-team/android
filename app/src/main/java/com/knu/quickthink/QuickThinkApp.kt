@@ -145,7 +145,7 @@ fun QuickThinkApp(
                             Surface(
                                 modifier = Modifier
                                     .width(400.dp)
-                                    .wrapContentHeight()
+                                    .height(400.dp)
                                     .padding(dimensionResource(id = R.dimen.vertical_margin))
                                     .clip(RoundedCornerShape(dimensionResource(id = R.dimen.dialog_roundedCorner)))
                                 ) {
