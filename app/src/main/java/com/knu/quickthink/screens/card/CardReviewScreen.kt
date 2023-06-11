@@ -1,5 +1,6 @@
 package com.knu.quickthink.screens.main
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -60,22 +61,22 @@ fun CardReviewScreen(
             onCloseBtnClicked = { showDeleteConfirmDialog = false }
         )
     }
-
-    if(uiState.isLoading){
-        CenterCircularProgressIndicator()
-    }else{
-        CardReview(
-            card = uiState.myCard,
-            onEditClicked = { onEditBtnClicked(cardId) },
-            onDeleteClicked = { showDeleteConfirmDialog = true },
-            onCloseClicked = onCloseBtnClicked,
-            onReviewClicked = {
-                viewModel.reviewCard()
-                onCloseBtnClicked()
-            }
-        )
+    Crossfade(targetState = uiState.isLoading) {isLoading ->
+        if(isLoading){
+            CenterCircularProgressIndicator()
+        }else{
+            CardReview(
+                card = uiState.myCard,
+                onEditClicked = { onEditBtnClicked(cardId) },
+                onDeleteClicked = { showDeleteConfirmDialog = true },
+                onCloseClicked = onCloseBtnClicked,
+                onReviewClicked = {
+                    viewModel.reviewCard()
+                    onCloseBtnClicked()
+                }
+            )
+        }
     }
-
 }
 
 @Composable

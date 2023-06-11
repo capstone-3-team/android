@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 data class FeedUiState(
-    val isLoading : Boolean = false,
+    val isLoading : Boolean = true,
     val cards : Cards<MyCard> = emptyMyCards,
     val hashTags: HashMap<String, Boolean> = HashMap(),
     val message : String = ""
@@ -30,7 +30,7 @@ class FeedViewModel @Inject constructor(
     private val cardRepository: CardRepository,
 ): ViewModel(){
 
-    private val _uiState = MutableStateFlow(FeedUiState(isLoading = true))
+    private val _uiState = MutableStateFlow(FeedUiState())
     val uiState :StateFlow<FeedUiState> = _uiState.asStateFlow()
 
     fun fetchContent(){

@@ -17,7 +17,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 data class AccountUiState(
-    val isLoading : Boolean = false,
+    val isLoading : Boolean = true,
     val userInfo :UserInfo = UserInfo(),
     val isUpdateSuccess : Boolean = false,
 )
@@ -31,10 +31,11 @@ class AccountViewModel @Inject constructor(
     val uiState : StateFlow<AccountUiState> = _uiState.asStateFlow()
     init {
         viewModelScope.launch{
+            _uiState.update { it.copy(isLoading = true) }
             repository.fetchUserInfo(null)
                 .onSuccess {
                     _uiState.update { state ->
-                        state.copy(userInfo = it)
+                        state.copy(userInfo = it, isLoading = false)
                     }
                 }.onError { code, message ->
                     Timber.tag("account").d("onError code : $code, msg : $message")

@@ -19,7 +19,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 data class CardReviewUiState(
-    val isLoading : Boolean = false,
+    val isLoading : Boolean = true,
     val myCard: MyCard = emptyMyCard,
     val isDeleted : Boolean = false
 )

@@ -89,70 +89,72 @@ fun CardEditScreen(
 //        Timber.d("content : ${uiState.content.text}")
 //    }
 
-    if(uiState.isLoading){
-        CenterCircularProgressIndicator()
-    }else{
-        Scaffold(
-            modifier = Modifier
-                .systemBarsPadding()
-                .navigationBarsPadding(),
-            topBar = {
-                CardEditTopAppBar(
-                    isPreview = uiState.isPreview,
-                    onBackClicked = {
-                        viewModel.updateCard()
-                        onBackClicked()
-                    },
-                    onPreviewEditClicked = { viewModel.reverseIsPreview() },
-                    onDeleteClicked = { showDeleteConfirmDialog = true },
-                )
-            }
-        ) { paddingValues ->
-            Column(
+    Crossfade(targetState = uiState.isLoading) {isLoading ->
+        if(isLoading){
+            CenterCircularProgressIndicator()
+        }else{
+            Scaffold(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.White)
-                    .padding(paddingValues)
-                    .padding(
-                        start = dimensionResource(id = R.dimen.horizontal_margin),
-                        end = dimensionResource(id = R.dimen.horizontal_margin)
-                    ),
-    //                    .addFocusCleaner(keyboardController!!)
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                CardTitle(
-                    title = uiState.myCard.title,
-                    isPreview = uiState.isPreview
-                ){
-                    viewModel.updateUiStateOfCard(uiState.myCard.copy(title = it))
+                    .systemBarsPadding()
+                    .navigationBarsPadding(),
+                topBar = {
+                    CardEditTopAppBar(
+                        isPreview = uiState.isPreview,
+                        onBackClicked = {
+                            viewModel.updateCard()
+                            onBackClicked()
+                        },
+                        onPreviewEditClicked = { viewModel.reverseIsPreview() },
+                        onDeleteClicked = { showDeleteConfirmDialog = true },
+                    )
                 }
-                HashTagTextField(
-                    hashTags = uiState.myCard.hashTags,
-                    modifier = Modifier.fillMaxWidth(),
-//                    enabled = uiState.isPreview,
-                    readOnly = uiState.isPreview,
-                    onChipUpdated = {
-                        Timber.d("onChipUpdated : $it")
-                        viewModel.updateUiStateOfCard(uiState.myCard.copy(hashTags = it.toHashSet()))
-                    },
-                    onChipClicked = { _, _ -> },
-                    onChipDeleteClicked = { _, _ -> }
-                )
-                CardContent(
-                    modifier = Modifier,
-                    uiState = uiState,
-                    focusRequester = focusRequester,
-    //                    contentImePadding = contentImePadding,
-                    onFocusChanged = {focusState ->
-                        if(focusState.isFocused || focusState.hasFocus) viewModel.startEditing()
-                        else viewModel.finishEditing()
-                    },
-                    onValueChange = {
-                        viewModel.updateUiState(uiState.copy(content = it))
-//                        viewModel.updateUiStateOfCard(uiState.myCard.copy(content = it.text))
-                    },
-                    onContentClicked = { viewModel.reverseIsPreview() }
-                )
+            ) { paddingValues ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White)
+                        .padding(paddingValues)
+                        .padding(
+                            start = dimensionResource(id = R.dimen.horizontal_margin),
+                            end = dimensionResource(id = R.dimen.horizontal_margin)
+                        ),
+        //                    .addFocusCleaner(keyboardController!!)
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    CardTitle(
+                        title = uiState.myCard.title,
+                        isPreview = uiState.isPreview
+                    ){
+                        viewModel.updateUiStateOfCard(uiState.myCard.copy(title = it))
+                    }
+                    HashTagTextField(
+                        hashTags = uiState.myCard.hashTags,
+                        modifier = Modifier.fillMaxWidth(),
+    //                    enabled = uiState.isPreview,
+                        readOnly = uiState.isPreview,
+                        onChipUpdated = {
+                            Timber.d("onChipUpdated : $it")
+                            viewModel.updateUiStateOfCard(uiState.myCard.copy(hashTags = it.toHashSet()))
+                        },
+                        onChipClicked = { _, _ -> },
+                        onChipDeleteClicked = { _, _ -> }
+                    )
+                    CardContent(
+                        modifier = Modifier,
+                        uiState = uiState,
+                        focusRequester = focusRequester,
+        //                    contentImePadding = contentImePadding,
+                        onFocusChanged = {focusState ->
+                            if(focusState.isFocused || focusState.hasFocus) viewModel.startEditing()
+                            else viewModel.finishEditing()
+                        },
+                        onValueChange = {
+                            viewModel.updateUiState(uiState.copy(content = it))
+    //                        viewModel.updateUiStateOfCard(uiState.myCard.copy(content = it.text))
+                        },
+                        onContentClicked = { viewModel.reverseIsPreview() }
+                    )
+                }
             }
         }
     }

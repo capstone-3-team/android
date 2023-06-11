@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 
 data class CardEditUiState(
-    val isLoading : Boolean = false,
+    val isLoading : Boolean = true,
     val myCard: MyCard = emptyMyCard,
     val content : TextFieldValue = TextFieldValue(""),
     val isContentEditing : Boolean = false,
