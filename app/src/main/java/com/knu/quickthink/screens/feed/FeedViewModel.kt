@@ -30,7 +30,7 @@ class FeedViewModel @Inject constructor(
     private val cardRepository: CardRepository,
 ): ViewModel(){
 
-    private val _uiState = MutableStateFlow(FeedUiState())
+    private val _uiState = MutableStateFlow(FeedUiState(isLoading = true))
     val uiState :StateFlow<FeedUiState> = _uiState.asStateFlow()
 
     fun fetchContent(){
