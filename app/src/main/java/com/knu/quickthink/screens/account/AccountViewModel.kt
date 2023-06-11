@@ -6,36 +6,36 @@ import com.knu.quickthink.model.onError
 import com.knu.quickthink.model.onException
 import com.knu.quickthink.model.onSuccess
 import com.knu.quickthink.repository.user.UserRepository
+import com.knu.quickthink.screens.search.UserInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+
+data class AccountUiState(
+    val isLoading : Boolean = false,
+    val userInfo :UserInfo = UserInfo(),
+    val isUpdateSuccess : Boolean = false,
+)
 
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     private val repository : UserRepository
 ): ViewModel(){
 
-    private val _profileImage = MutableStateFlow("https://lh3.googleusercontent.com/a/AGNmyxbXgisKVPcdOHLgTDqJTbyFz7r7QmkTchH1t9VS=s96-c")
-    val profileImage :StateFlow<String> = _profileImage.asStateFlow()
-
-    private val _googleId = MutableStateFlow("Google ID")
-    val googleId :StateFlow<String> = _googleId.asStateFlow()
-
-    private val _introduction = MutableStateFlow("자기소개 내용을 입력하세요")
-    val introduction : StateFlow<String> = _introduction.asStateFlow()
-
-    private val _isUpdateSuccess = MutableStateFlow(false)
-    val isUpdateSuccess: StateFlow<Boolean> = _isUpdateSuccess.asStateFlow()
-
+    private val _uiState = MutableStateFlow(AccountUiState())
+    val uiState : StateFlow<AccountUiState> = _uiState.asStateFlow()
     init {
         viewModelScope.launch{
-            repository.fetchIntroduction()
+            repository.fetchUserInfo(null)
                 .onSuccess {
-                    _introduction.value = it.text
+                    _uiState.update { state ->
+                        state.copy(userInfo = it)
+                    }
                 }.onError { code, message ->
                     Timber.tag("account").d("onError code : $code, msg : $message")
                 }.onException {
@@ -45,18 +45,17 @@ class AccountViewModel @Inject constructor(
     }
 
     fun editIntroduction(newIntroduction : String){
-        _introduction.value = newIntroduction
+        _uiState.update { state ->
+            state.copy(userInfo = state.userInfo.copy(profileText = newIntroduction))
+        }
     }
 
     fun updateIntroduction(){
         viewModelScope.launch {
-            repository.updateIntroduction(introduction.value)
+            repository.updateIntroduction(uiState.value.userInfo.profileText ?: "")
                 .onSuccess {
-                    _isUpdateSuccess.value = true
+                    _uiState.update {it.copy(isUpdateSuccess = true) }
                 }.onError { code, message ->
-                    if(code == 200){
-                        _isUpdateSuccess.value = true
-                    }
                     Timber.tag("account").d("onError code : $code, msg : $message")
                 }.onException {
                     Timber.tag("account").d("onException msg : ${it.message}")

@@ -61,7 +61,7 @@ class FeedViewModel @Inject constructor(
                 hashTags = HashTags(_uiState.value.hashTags.filterValues { it }.keys.toList())
             ).onSuccess {
                 _uiState.update { state ->
-                    state.copy(cards = sortCardsByLatestReviewDate(it), isLoading = false)
+                    state.copy(cards = sortCardsByLatestReviewDate(it))
                 }
             }.onErrorOrException{ code, message ->
                 Timber.d("code : $code  message : $message")
@@ -69,6 +69,7 @@ class FeedViewModel @Inject constructor(
                     state.copy(cards = emptyMyCards, isLoading = false, message = message ?: "알 수 없는 오류")
                 }
             }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
