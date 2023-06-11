@@ -155,7 +155,7 @@ fun QuickThinkApp(
                         }
                         composable(route = MainDestination.CHATGPT_ROUTE) {
                             ChatGptScreen(
-                                onBackPressed = {appState.navController.navigate(MainDestination.FEED_ROUTE)}
+                                onBackPressed = {appState.navController.popBackStack()}
                             )
                         }
                         bottomSheet(route = MainDestination.SERACH_ROUTE) {
@@ -201,7 +201,7 @@ fun QuickThinkApp(
                             val cardId = it.arguments?.getLong("cardId") ?: -1
                             CardEditScreen(
                                 cardId = cardId,
-                                onBackClicked = {appState.navController.navigate(MainDestination.MAIN_ROUTE)},
+                                onBackClicked = {appState.navController.popBackStack()},
                                 onDoneClicked = {appState.navController.navigate(MainDestination.MAIN_ROUTE)})
                         }
                     }

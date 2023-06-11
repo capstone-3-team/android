@@ -1,6 +1,7 @@
 package com.knu.quickthink.screens.main
 
 import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.BorderStroke
@@ -11,6 +12,7 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -49,6 +51,11 @@ fun FeedScreen(
     if (window != null) {
         WindowCompat.setDecorFitsSystemWindows(window, true)        // CardEdit 갔다가 돌아왔을 때 부드럽게 연결하기 위해 DisposableEffect대신 사용
     }
+
+    LaunchedEffect(Unit ){
+        viewModel.fetchContent()
+    }
+
 
     Timber.d("cards : ${uiState.cards}")
     Column(modifier = Modifier.fillMaxSize()){

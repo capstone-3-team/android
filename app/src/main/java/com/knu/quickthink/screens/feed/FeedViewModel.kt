@@ -31,11 +31,10 @@ class FeedViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(FeedUiState())
     val uiState :StateFlow<FeedUiState> = _uiState.asStateFlow()
 
-    init {
+    fun fetchContent(){
         fetchHashTags()
         fetchMyCards()
     }
-
     private fun fetchHashTags() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
