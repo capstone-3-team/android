@@ -30,9 +30,10 @@ fun rememberQuickThinkAppState(
     },
     coroutineScope :CoroutineScope = rememberCoroutineScope(),
     isMainRoute : MutableState<Boolean> = remember { mutableStateOf(false)},
+    isFeedRoute : MutableState<Boolean> = remember { mutableStateOf(false)},
     menuExpanded : MutableState<Boolean> = remember { mutableStateOf(false)},
 ) = remember(navController,bottomSheetNavigator,coroutineScope,sheetState,feedScreenState,isMainRoute,menuExpanded){
-    QuickThinkAppState(navController,bottomSheetNavigator,coroutineScope,sheetState,feedScreenState,isMainRoute,menuExpanded)
+    QuickThinkAppState(navController,bottomSheetNavigator,coroutineScope,sheetState,feedScreenState,isMainRoute,isFeedRoute,menuExpanded)
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialNavigationApi::class)
@@ -43,6 +44,7 @@ class QuickThinkAppState(
     val sheetState : ModalBottomSheetState,
     val feedScreenState : FeedScreenState,
     val isMainRoute : MutableState<Boolean>,
+    val isFeedRoute : MutableState<Boolean>,
     val menuExpanded : MutableState<Boolean>,
 ) {
     fun addDestinationChangedListener(
@@ -54,6 +56,7 @@ class QuickThinkAppState(
             }else if(isMainRoute.value && !destination.route!!.contains("main")){
                 isMainRoute.value = false
             }
+            isFeedRoute.value = destination.route!! == MainDestination.FEED_ROUTE
         }
         navController.addOnDestinationChangedListener(callback)
     }

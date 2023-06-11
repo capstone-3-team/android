@@ -75,7 +75,11 @@ fun QuickThinkApp(
                     QuickThinkTopAppBar(
                         isMainRoute = appState.isMainRoute.value,
                         menuExpanded = appState.menuExpanded,
-                        onLogoClicked = { appState.navController.navigate(MainDestination.MAIN_ROUTE) },
+                        onLogoClicked = {
+                            if(!appState.isFeedRoute.value){
+                                appState.navController.navigate(MainDestination.MAIN_ROUTE)
+                            }
+                        },
                         onSearchClicked = {
                             appState.navController.navigate(MainDestination.SERACH_ROUTE)
                         },
@@ -85,7 +89,7 @@ fun QuickThinkApp(
                     )
                 },
                 floatingActionButton = {
-                    if (appState.isMyFeedScreen) {
+                    if (appState.isFeedRoute.value) {
                         FABContent {
                             val cardId : Long = -1
                             appState.navController.navigate("${MainDestination.CARD_EDIT_ROUTE}/$cardId")
