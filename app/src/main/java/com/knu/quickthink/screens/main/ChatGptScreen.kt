@@ -2,18 +2,15 @@ package com.knu.quickthink.screens.main
 
 import android.app.Activity
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -40,37 +37,31 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.core.view.WindowCompat
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
-import com.knu.quickthink.components.profileImage
-import com.knu.quickthink.screens.search.UserInfo
 import timber.log.Timber
 
 @Composable
 fun ChatGptScreen(
     viewModel: ChatGptViewModel = hiltViewModel(),
+    onBackPressed : () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var question by remember {mutableStateOf("")}
 
+    ChatGptContent(
+        messages = uiState.messageDataList,
+        isMessageEmpty = uiState.messageDataList.isEmpty(),
+        isChatGptTyping = uiState.isLoading,
+        onMessageSent = { message ->
+            viewModel.askToGpt(message)
+        },
+        onMessageSaved = { message ->
 
-//    Surface(modifier = Modifier.fillMaxSize()) {
-        ChatGptContent(
-            messages = uiState.messageDataList,
-            isMessageEmpty = uiState.messageDataList.isEmpty(),
-            isChatGptTyping = uiState.isLoading,
-            onMessageSent = { message ->
-                viewModel.askToGpt(message)
-            },
-            onMessageSaved = { message ->
-
-            }
-        )
-//    }
+        },
+        onBackPressed = onBackPressed
+    )
 
 }
 
@@ -79,6 +70,7 @@ fun ChatGptContent(
     messages: List<MessageData>,
     isMessageEmpty: Boolean,
     isChatGptTyping: Boolean,
+    onBackPressed : () -> Unit,
     onMessageSent: (String) -> Unit,
     onMessageSaved: (String) -> Unit
 ) {
@@ -98,7 +90,7 @@ fun ChatGptContent(
     Scaffold(
         modifier = Modifier.systemBarsPadding(),
         topBar = { ChatGptTopAppBar(
-            onBackClicked = {}
+            onBackPressed = onBackPressed
         )},
         containerColor = Color.White,
         contentWindowInsets = ScaffoldDefaults
@@ -110,8 +102,6 @@ fun ChatGptContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-//                .verticalScroll(rememberScrollState()),
-//            verticalArrangement = Arrangement.SpaceBetween
         ) {
             ChatGptInfoBox(
                 isMessageEmpty = isMessageEmpty,
@@ -121,17 +111,13 @@ fun ChatGptContent(
                 messages = messages,
                 navigateToProfile = {  },
                 modifier = Modifier
-//                    .height(300.dp)
-                    .weight(1f)
-//                    .background(Color.Green)
-                ,
+                    .weight(1f),
                 scrollState = scrollState,
                 onMessageSaved = onMessageSaved
             )
             UserInput(
                 onMessageSent = onMessageSent,
                 modifier = Modifier
-//                    .navigationBarsPadding()
                     .imePadding()
                 ,
                 onTextFieldFocused = {focused ->
@@ -142,7 +128,6 @@ fun ChatGptContent(
                     }
                 }
             )
-//            Text("hellod")
         }
     }
 }
@@ -379,13 +364,13 @@ fun MessageTextBox(
 
 @Composable
 fun ChatGptTopAppBar(
-    onBackClicked: () -> Unit,
+    onBackPressed: () -> Unit,
 ) {
     val menuExpanded = remember { mutableStateOf(false) }
     TopAppBar(
         title = { Text("ChatGPT에게 물어보기",style = MaterialTheme.typography.h6) },
         navigationIcon = {
-            IconButton(onClick =onBackClicked) {
+            IconButton(onClick = onBackPressed) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "arrowBack"
@@ -429,7 +414,8 @@ fun ChatGptContentPrev() {
             isMessageEmpty = false,
             isChatGptTyping = true,
             onMessageSent = {},
-            onMessageSaved = {}
+            onMessageSaved = {},
+            onBackPressed = {}
         )
     }
 }

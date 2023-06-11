@@ -154,7 +154,9 @@ fun QuickThinkApp(
                                 }
                         }
                         composable(route = MainDestination.CHATGPT_ROUTE) {
-                            ChatGptScreen()
+                            ChatGptScreen(
+                                onBackPressed = {appState.navController.navigate(MainDestination.FEED_ROUTE)}
+                            )
                         }
                         bottomSheet(route = MainDestination.SERACH_ROUTE) {
                             BoxWithConstraints() {
