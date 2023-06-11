@@ -14,6 +14,7 @@ import com.knu.quickthink.model.user.UserListResponse
 import com.knu.quickthink.network.RetrofitFailureStateException
 import com.knu.quickthink.network.UserManager
 import com.knu.quickthink.screens.search.UserInfo
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
@@ -71,24 +72,22 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun fetchIntroduction(): NetworkResult<IntroductionResponse> {
-        val userToken = userTokenDataStore.getUserToken()
-        return remoteDataSource.fetchIntroduction(userToken.token, userToken.googleId)
+        val user = userManager.userState.value
+        return remoteDataSource.fetchIntroduction(user.googleId)
     }
 
     override suspend fun updateIntroduction(introduction: String): NetworkResult<String> {
-        val userToken = userTokenDataStore.getUserToken()
-        return remoteDataSource.updateIntroduction(
-            userToken.token,
-            userToken.googleId,
-            introduction
-        )
+        val user = userManager.userState.value
+        return remoteDataSource.updateIntroduction(user.googleId,introduction)
     }
 
     override suspend fun searchUsers(searchName: String): NetworkResult<UserListResponse> =
         remoteDataSource.searchUsers(searchName)
 
-    override suspend fun searchUser(googleId: String): NetworkResult<UserInfo>  =
-        remoteDataSource.searchUser(googleId)
+    override suspend fun fetchUserInfo(googleId: String?): NetworkResult<UserInfo>  {
+        val user = userManager.userState.value
+        return remoteDataSource.searchUser(googleId ?:user.googleId)
+    }
 
     override suspend fun autoLogin(): Boolean {
         var isLoggedIn = true

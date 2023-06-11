@@ -68,7 +68,7 @@ fun QuickThinkApp(
         appState.navController.navigatorProvider += appState.bottomSheetNavigator
         ModalBottomSheetLayout(
             bottomSheetNavigator = appState.bottomSheetNavigator,
-            sheetShape = RoundedCornerShape(20.dp)
+            sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
         ) {
             Scaffold(
                 topBar = {

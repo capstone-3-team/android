@@ -34,13 +34,11 @@ interface UserApiService {
 
     @GET("/api/profile")
     suspend fun fetchIntroduction(
-        @Header("accessToken") accessToken: String,
         @Query("googleId") googleId: String
     ) :NetworkResult<IntroductionResponse>
 
     @POST("/api/profile")
     suspend fun updateIntroduction(
-        @Header("accessToken") accessToken: String,
         @Query("googleId") googleId : String,
         @Body text: String
     ) : NetworkResult<String>

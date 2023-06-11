@@ -1,5 +1,6 @@
 package com.knu.quickthink.screens.account
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -18,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
@@ -39,13 +41,14 @@ fun AccountScreen(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val profileImage by viewModel.profileImage.collectAsState()
-    val googleId by viewModel.googleId.collectAsState()
-    val introduction by viewModel.introduction.collectAsState()
-    val isUpdateSuccess by viewModel.isUpdateSuccess.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
-    LaunchedEffect(isUpdateSuccess){
-        if (isUpdateSuccess) onCloseClicked()
+    LaunchedEffect(uiState.isUpdateSuccess){
+        if (uiState.isUpdateSuccess) {
+            Toast.makeText(context, "프로필 수정 완료",Toast.LENGTH_SHORT).show()
+            onCloseClicked()
+        }
     }
     Column(
         modifier = Modifier
@@ -59,12 +62,12 @@ fun AccountScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             profileImage(
-                imageUrl = profileImage,
+                imageUrl = uiState.userInfo.profilePicture,
                 imageSize = dimensionResource(id = R.dimen.myProfile_image),
             )
             Text(
                 modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin)),
-                text = googleId,
+                text = uiState.userInfo.googleName,
                 style = MaterialTheme.typography.h6
             )
         }
@@ -76,7 +79,7 @@ fun AccountScreen(
         )
 
         OutlinedTextField(
-            value = introduction,
+            value = uiState.userInfo.profileText ?: "",
             onValueChange = viewModel::editIntroduction,
             placeholder = { Text("자기소개를 입력해주세요") },
             modifier = Modifier
