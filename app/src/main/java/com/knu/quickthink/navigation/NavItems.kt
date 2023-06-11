@@ -7,7 +7,7 @@ object MainDestination{
     const val MAIN_ROUTE = "main"
     const val FEED_ROUTE = "main/feed"
     const val OTHERS_FEED_ROUTE = "main/othersfeed"
-    const val CHATGPT_ROUTE = "main/chatgpt"
+    const val CHATGPT_ROUTE = "chatgpt"
     const val SERACH_ROUTE = "main/search"
     const val ACCOUNT_ROUTE = "main/account"
     const val CARD_VIEW_ROUTE = "main/cardview"

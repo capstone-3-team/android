@@ -15,11 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.QuickThink"
         tools:targetApi="31">
-<!--        android:windowSoftInputMode="adjustResize"-->
         <activity
             android:name="com.knu.quickthink.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.QuickThink">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

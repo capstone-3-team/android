@@ -19,7 +19,7 @@ data class Usage (
 )
 
 data class Choice(
-    val message : ChatMessage,
+    val message : MessageRequest,
     val finish_reason : String,
     val index : Int
 )
