@@ -1,6 +1,8 @@
 package com.knu.quickthink
 
 import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.navigation.NavController
@@ -22,12 +24,15 @@ fun rememberQuickThinkAppState(
         skipHalfExpanded = true,
         confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded }
     ),
+    feedScreenState : FeedScreenState = rememberFeedScreenState(),
     bottomSheetNavigator :BottomSheetNavigator = remember{
         BottomSheetNavigator(sheetState)
     },
     coroutineScope :CoroutineScope = rememberCoroutineScope(),
-) = remember(navController,bottomSheetNavigator,coroutineScope,sheetState){
-    QuickThinkAppState(navController,bottomSheetNavigator,coroutineScope,sheetState)
+    isMainRoute : MutableState<Boolean> = remember { mutableStateOf(false)},
+    menuExpanded : MutableState<Boolean> = remember { mutableStateOf(false)},
+) = remember(navController,bottomSheetNavigator,coroutineScope,sheetState,feedScreenState,isMainRoute,menuExpanded){
+    QuickThinkAppState(navController,bottomSheetNavigator,coroutineScope,sheetState,feedScreenState,isMainRoute,menuExpanded)
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialNavigationApi::class)
@@ -36,8 +41,9 @@ class QuickThinkAppState(
     val bottomSheetNavigator :BottomSheetNavigator,
     val coroutineScope :CoroutineScope,
     val sheetState : ModalBottomSheetState,
-    val isMainRoute : MutableState<Boolean> = mutableStateOf(false),
-    val menuExpanded : MutableState<Boolean> = mutableStateOf(false),
+    val feedScreenState : FeedScreenState,
+    val isMainRoute : MutableState<Boolean>,
+    val menuExpanded : MutableState<Boolean>,
 ) {
     fun addDestinationChangedListener(
     ){
@@ -58,6 +64,20 @@ class QuickThinkAppState(
     val isMyFeedScreen : Boolean
         @Composable get() = navController.currentBackStackEntryAsState().value?.destination?.route == MainDestination.FEED_ROUTE
 }
+
+class FeedScreenState (
+    val hashTagListState : LazyListState,
+    val feedListState : LazyListState
+)
+
+@Composable
+fun rememberFeedScreenState() : FeedScreenState{
+    return FeedScreenState(
+        hashTagListState = rememberLazyListState(),
+        feedListState = rememberLazyListState()
+    )
+}
+
 
 @ExperimentalMaterialNavigationApi
 @OptIn(ExperimentalMaterialApi::class)

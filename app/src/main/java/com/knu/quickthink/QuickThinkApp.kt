@@ -78,8 +78,6 @@ fun QuickThinkApp(
                         onLogoClicked = { appState.navController.navigate(MainDestination.MAIN_ROUTE) },
                         onSearchClicked = {
                             appState.navController.navigate(MainDestination.SERACH_ROUTE)
-                            appState.coroutineScope.launch {
-                            }
                         },
                         onChatGPTClicked = { appState.navController.navigate(MainDestination.CHATGPT_ROUTE) },
                         onSignOutClicked = { mainViewModel.logout() },
@@ -95,7 +93,7 @@ fun QuickThinkApp(
                     }
                 }
             ) { innerPaddingModifier ->
-                LaunchedEffect(appState.navController) {
+                LaunchedEffect(Unit) {
                     appState.addDestinationChangedListener()
                 }
                 NavHost( /* Root NavHost */
@@ -120,6 +118,7 @@ fun QuickThinkApp(
                     ) {
                         composable(route = MainDestination.FEED_ROUTE) { navBackStackEntry ->
                             FeedScreen(
+                                feedScreenState = appState.feedScreenState,
                                 onCardClick = {
                                     appState.navController.navigate("${MainDestination.CARD_VIEW_ROUTE}/$it")
                                 },
@@ -154,7 +153,9 @@ fun QuickThinkApp(
                                 }
                         }
                         composable(route = MainDestination.CHATGPT_ROUTE) {
-                            ChatGPTScreen()
+                            ChatGptScreen(
+                                onBackPressed = {appState.navController.popBackStack()}
+                            )
                         }
                         bottomSheet(route = MainDestination.SERACH_ROUTE) {
                             BoxWithConstraints() {
@@ -199,7 +200,7 @@ fun QuickThinkApp(
                             val cardId = it.arguments?.getLong("cardId") ?: -1
                             CardEditScreen(
                                 cardId = cardId,
-                                onBackClicked = {appState.navController.navigate(MainDestination.MAIN_ROUTE)},
+                                onBackClicked = {appState.navController.popBackStack()},
                                 onDoneClicked = {appState.navController.navigate(MainDestination.MAIN_ROUTE)})
                         }
                     }

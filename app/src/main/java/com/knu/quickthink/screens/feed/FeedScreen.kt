@@ -1,16 +1,16 @@
 package com.knu.quickthink.screens.main
 
 import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.knu.quickthink.FeedScreenState
 import com.knu.quickthink.R
 import com.knu.quickthink.components.*
 import com.knu.quickthink.model.card.Cards
@@ -39,16 +40,23 @@ import timber.log.Timber
 @Composable
 fun FeedScreen(
     viewModel :FeedViewModel = hiltViewModel(),
+    feedScreenState: FeedScreenState,
     onCardClick : (Long) -> Unit,
     onCardEditClick : (Long) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val hashTagListState = rememberLazyListState()
+    val hashTagListState = feedScreenState.hashTagListState
+    val feedListState = feedScreenState.feedListState
     val window = (LocalContext.current as? Activity)?.window
 
     if (window != null) {
         WindowCompat.setDecorFitsSystemWindows(window, true)        // CardEdit 갔다가 돌아왔을 때 부드럽게 연결하기 위해 DisposableEffect대신 사용
     }
+
+    LaunchedEffect(Unit ){
+        viewModel.fetchContent()
+    }
+
 
     Timber.d("cards : ${uiState.cards}")
     Column(modifier = Modifier.fillMaxSize()){
@@ -69,7 +77,7 @@ fun FeedScreen(
             }else {
                 CardFeedContent(
                     cards = uiState.cards,
-                    currentFilteringLabel = R.string.app_name,
+                    lazyListState = feedListState,
                     onCardClick = onCardClick,
                     onCardEditClick = onCardEditClick,
                     onCardReviewed = {
@@ -85,7 +93,7 @@ fun FeedScreen(
 fun CardFeedContent(
 //    loading: Boolean,
     cards: Cards<MyCard>,
-    @StringRes currentFilteringLabel: Int,
+    lazyListState : LazyListState,
     onCardClick: (Long) -> Unit,
     onCardEditClick : (Long) -> Unit,
     onCardReviewed: (Long) -> Unit,
@@ -96,7 +104,9 @@ fun CardFeedContent(
             .fillMaxSize()
 //            .padding(horizontal = dimensionResource(id = R.dimen.horizontal_margin))
     ) {
-        LazyColumn {
+        LazyColumn(
+            state = lazyListState
+        ) {
             itemsIndexed(cards.cards) { index, card ->
                 CardItem(
                     card = card,
@@ -148,7 +158,7 @@ fun CardContentPreview() {
     Surface {
         CardFeedContent(
             cards = dummyMyCards,
-            currentFilteringLabel = R.string.app_name,
+            lazyListState = rememberLazyListState(),
             onCardClick = {},
             onCardEditClick = {},
             onCardReviewed = { _ -> }

@@ -1,7 +1,9 @@
 package com.knu.quickthink.di
 
 import com.knu.quickthink.network.apiService.CardApiService
+import com.knu.quickthink.network.apiService.ChatGptApiService
 import com.knu.quickthink.network.apiService.UserApiService
+import com.knu.quickthink.network.networkResultCallAdapter.NetworkResultCallAdapterFactory
 import com.knu.quickthink.repository.card.CardRepository
 import com.knu.quickthink.repository.card.CardRepositoryImpl
 import com.knu.quickthink.repository.user.UserRepository
@@ -11,7 +13,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -28,23 +33,5 @@ object NetworkModule {
     fun provideCardApiService(retrofit: Retrofit): CardApiService {
         return retrofit.create(CardApiService::class.java)
     }
-
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class RepositoryModule {
-
-    @Singleton
-    @Binds
-    abstract fun bindAuthRepository(
-        UserRepositoryImpl: UserRepositoryImpl
-    ): UserRepository
-
-    @Singleton
-    @Binds
-    abstract fun bindCardRepository(
-        CardRepositoryImpl: CardRepositoryImpl
-    ): CardRepository
 
 }
